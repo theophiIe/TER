@@ -1,98 +1,106 @@
+import unicodedata
+from pprint import pprint
+
 import requests
 import re
 from bs4 import BeautifulSoup
 
-url = 'https://lessurligneurs.eu/lire/'
+
+class Article:
+    def __init__(self):
+        self.url = 'https://lessurligneurs.eu/lire/'
+        self.long = 'article_long'
+        self.court = 'article_court'
+        self.liens_article_court = []
+        self.titre_article_court = []
+        self.liens_article_long = []
+        self.titre_article_long = []
+        self.etiquette = []
+        self.article_en_lien = []
+        self.contenu = []
+        self.auteur_article_court = []
+        self.auteur_article_long = []
+        self.source_citation = []
+        self.date_citation = []
+
+    def get_nombre_pages(self) -> int:
+        return int(str(BeautifulSoup(requests.get(self.url + "page/2/").content, 'lxml').find('title')).split(' ')[5])
+
+    def liens_articles(self, num_page, type_article) -> None:
+        page = BeautifulSoup(requests.get(self.url + "page/" + str(num_page)).content, 'lxml').find_all(
+            class_=type_article)
+
+        for liens in page:
+            for link in liens.find_all('a'):
+                if type_article == self.court:
+                    self.liens_article_court.append(link.get('href'))
+                else:
+                    self.liens_article_long.append(link.get('href'))
+
+    def titre_articles(self) -> None:
+        for article in self.liens_article_court:
+            self.titre_article_court.append(
+                article.replace('https://lessurligneurs.eu/', '').replace('-', ' ').replace('/', ''))
+
+        for article in self.liens_article_long:
+            self.titre_article_long.append(
+                article.replace('https://lessurligneurs.eu/', '').replace('-', ' ').replace('/', ''))
+
+    def etiquette_article(self, page) -> None:
+        for article in page.find_all('article'):
+            for etiquettes in article.find_all('button'):
+                self.etiquette.append(etiquettes.text)
+
+    def annexe_article(self, page) -> None:
+        liens = page.find_all(class_='related')
+        for lien in liens:
+            lien_article = []
+            for link in lien.find_all('a'):
+                lien_article.append(link.get('href'))
+            self.article_en_lien.append(lien_article)
+
+    def contenu_article(self, page) -> None:
+        for article in page.find_all('article'):
+            content = ''
+            for texte in article.find_all('p'):
+                content = content + " " + texte.text
+            self.contenu.append(unicodedata.normalize("NFKD", content))
+
+    def auteur_article(self, page) -> None:
+        for auteurs in page.find_all(class_='auteur'):
+            for auteur in auteurs:
+                noms = []
+                tmp = auteur.text.split("//")
+                for nom in tmp:
+                    noms.append(nom.split(',')[0])
+                self.auteur_article_court.append(noms)
+
+    def source_date_citation(self, page) -> None:
+        for dates_sources in page.find_all('h2'):
+            for date_source in dates_sources:
+                self.source_citation.append(date_source.text.split(',')[0])
+                self.date_citation.append(re.findall(r'[0-9]*[0-9] [a-z]+ [0-9]*[0-9]*[0-9]*[0-9]*', date_source.text.replace("é", "e")))
+
+# Ajout des textes de loi pour chaque article
+# Mieux les articles en sous paragraphe avec les sous-titres et l'intro
+# Trouver les noms des personnalités de l'article
 
 
-def get_nombre_pages(url_page) -> int:
-    return int(str(BeautifulSoup(requests.get(url_page + "page/2/").content, 'lxml').find('title')).split(' ')[5])
+if __name__ == '__main__':
+    a = Article()
+    # print(a.get_nombre_pages())
+    a.liens_articles(1, a.court)
+    a.liens_articles(1, a.long)
+    a.titre_articles()
 
+    # pprint(a.liens_article_court)
+    # print(a.titre_article_court[1])
 
-def liens_articles(url_page):
-    content = BeautifulSoup(requests.get(url_page + "page/1/").content, 'lxml').find_all(class_='inside')[1:]
+    content = BeautifulSoup(requests.get("https://lessurligneurs.eu/nicolas-dupont-aignan-veut-lutter-contre-les-decisions-aberrantes-des-cours-europeennes-en-refusant-lapplication-de-leur-jurisprudence/").content, 'lxml')
+    a.etiquette_article(content)
+    a.annexe_article(content)
+    a.auteur_article(content)
+    a.source_date_citation(content)
 
-    for links in content:
-        for link in links.find_all('a'):
-            print(link.get('href'))
-
-
-def all_liens_article(url_page):
-    tab_link = []
-    cmpt = get_nombre_pages(url_page)
-    for i in range(1, cmpt + 1):
-        content = BeautifulSoup(requests.get(url_page + "page/" + str(i)).content, 'lxml').find_all(class_='inside')[1:]
-        for links in content:
-            for link in links.find_all('a'):
-                tab_link.append(link.get('href'))
-
-    return tab_link
-
-# SKIP LE PREMIER TITRE ?
-def titre_article(url_page):
-    content = BeautifulSoup(requests.get(url_page + "page/1/").content, 'lxml').find_all(class_='container_h1')[1:]
-
-    for links in content:
-        for link in links.find_all('h1'):
-            print(link.text)
-
-
-def all_titre_article(url_page):
-    tab_titre = []
-    cmpt = get_nombre_pages(url_page)
-    for i in range(1, cmpt + 1):
-        content = BeautifulSoup(requests.get(url_page + "page/" + str(i)).content, 'lxml').find_all(
-            class_='container_h1')[1:]
-        for titres in content:
-            for titre in titres.find_all('h1'):
-                tab_titre.append(titre.text)
-
-    return tab_titre
-
-def source_article(url_page):
-    content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml')
-    for i in content.find('h2'):
-        return i.text.split(',')[0]
-
-
-def source_article_date(url_page):
-    content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml')
-    for i in content.find('h2'):
-        return i.text.split(',')[1]
-
-
-def auteur_article(url_page):
-    content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml')
-    for p in content.find(class_='auteur'):
-        print(p.text.split(","))
-
-
-def etiquette_article(url_page):
-    content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml')
-    for p in content.find('article').find_all('button'):
-        print(p.text)
-
-
-def contenu_article(url_page):
-    contenu = ''
-    content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml')
-    for p in content.find('article').find_all('p'):
-        contenu = contenu + " " + p.text
-
-    return contenu
-
-def annexe_article(url_page):
-    content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml').find_all(class_='related')[
-              0:1]
-    for links in content:
-        for link in links.find_all('a'):
-            print(link.get('href'))
-
-
-#print(contenu_article(url))
-#etiquette_article(url)
-#print(source_article(url))
-#print(source_article_date(url))
-#print(auteur_article(url))
-titre_article(url)
-annexe_article(url)
+    pprint(a.date_citation)
+    pprint(a.source_citation)
