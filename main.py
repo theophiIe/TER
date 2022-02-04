@@ -28,6 +28,26 @@ def all_liens_article(url_page):
 
     return tab_link
 
+# SKIP LE PREMIER TITRE ?
+def titre_article(url_page):
+    content = BeautifulSoup(requests.get(url_page + "page/1/").content, 'lxml').find_all(class_='container_h1')[1:]
+
+    for links in content:
+        for link in links.find_all('h1'):
+            print(link.text)
+
+
+def all_titre_article(url_page):
+    tab_titre = []
+    cmpt = get_nombre_pages(url_page)
+    for i in range(1, cmpt + 1):
+        content = BeautifulSoup(requests.get(url_page + "page/" + str(i)).content, 'lxml').find_all(
+            class_='container_h1')[1:]
+        for titres in content:
+            for titre in titres.find_all('h1'):
+                tab_titre.append(titre.text)
+
+    return tab_titre
 
 def source_article(url_page):
     content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml')
@@ -61,9 +81,18 @@ def contenu_article(url_page):
 
     return contenu
 
+def annexe_article(url_page):
+    content = BeautifulSoup(requests.get(all_liens_article(url_page)[1]).content, 'lxml').find_all(class_='related')[
+              0:1]
+    for links in content:
+        for link in links.find_all('a'):
+            print(link.get('href'))
+
 
 #print(contenu_article(url))
 #etiquette_article(url)
 #print(source_article(url))
 #print(source_article_date(url))
-print(auteur_article(url))
+#print(auteur_article(url))
+titre_article(url)
+annexe_article(url)
