@@ -41,7 +41,8 @@ class Article:
     def titre_articles_court(self, page) -> None:
         for article in page.find_all(class_='col-md-7'):
             for titre in article.find_all('h1'):
-                self.titre_article_court.append(titre.text)
+                if titre.text != '':
+                    self.titre_article_court.append(titre.text)
 
     def titre_articles_long(self, page) -> None:
         for article in page.find_all(class_='col-md-10'):
@@ -54,11 +55,12 @@ class Article:
                 self.etiquette.append(etiquettes.text)
 
     def annexe_article(self, page) -> None:
-        liens = page.find_all(class_='related')
-        for lien in liens:
+        for article in page.find_all(class_='container-fluid')[1:]:
             lien_article = []
-            for link in lien.find_all('a'):
-                lien_article.append(link.get('href'))
+            liens = article.find(class_='related')
+            if liens is not None:
+                for lien in liens.find_all('a'):
+                    lien_article.append(lien.get('href'))
             self.article_en_lien.append(lien_article)
 
     def contenu_article(self, page) -> None:
@@ -69,27 +71,31 @@ class Article:
             self.contenu.append(unicodedata.normalize("NFKD", content))
 
     def liens_article(self, page) -> None:
-        texte = page.find_all(class_='texte')
-        for liens in texte:
+        for article in page.find_all(class_='container-fluid')[1:]:
             lien_article = []
-            for lien in liens.find_all('a'):
+            for lien in article.find(class_='texte').find_all('a'):
                 lien_article.append(lien.get('href'))
             self.liens.append(lien_article)
 
     def auteur_article(self, page) -> None:
-        for auteurs in page.find_all(class_='auteur'):
-            for auteur in auteurs:
-                noms = []
-                tmp = auteur.text.split("//")
+        for article in page.find_all(class_='container-fluid')[1:]:
+            auteur = []
+            for auteurs in article.find(class_='auteur'):
+                tmp = auteurs.text.split("//")
                 for nom in tmp:
-                    noms.append(nom.split(',')[0])
-                self.auteur_article_court.append(noms)
+                    auteur.append(nom.split(',')[0])
+            self.auteur_article_court.append(auteur)
 
     def source_date_citation(self, page) -> None:
-        for dates_sources in page.find_all('h2'):
+        for article in page.find_all(class_='container-fluid')[1:]:
+            date = []
+            source = []
+            dates_sources = article.find('h2')
             for date_source in dates_sources:
-                self.source_citation.append(date_source.text.split(',')[0])
-                self.date_citation.append(re.findall(r'[0-9]*[0-9] [a-é]+ [0-9]*[0-9]*[0-9]*[0-9]*', date_source.text))
+                date.append(re.findall(r'[0-9]*[0-9] [a-é]+ [0-9]*[0-9]*[0-9]*[0-9]*', date_source.text))
+                source.append(date_source.text.split(',')[0])
+            self.source_citation.append(source)
+            self.date_citation.append(date)
 
 
 def recup_article() -> None:
@@ -101,7 +107,7 @@ def recup_article() -> None:
         articles.url_articles(num, articles.court)
 
     while num_article < len(articles.url_article_court):
-        page = BeautifulSoup(requests.get(articles.url_article_court[num_article]).content, 'html.parser')
+        page = BeautifulSoup(requests.get(articles.url_article_court[num_article]).content, 'lxml')
 
         articles.titre_articles_court(page)
         articles.etiquette_article(page)
@@ -159,6 +165,7 @@ def recup_article() -> None:
 
 if __name__ == '__main__':
     recup_article()
+
 
 
 
