@@ -1,5 +1,5 @@
-import requests
-from bs4 import BeautifulSoup
+import unicodedata
+
 from abc import abstractmethod, ABC
 
 
@@ -13,13 +13,6 @@ class Article(ABC):
         self.contenu_articles = []
         self.liens_citations = []
 
-    def get_nombre_pages(self) -> int:
-        page = requests.get(f"{self.url}page/2/")
-        soup = BeautifulSoup(page.content, 'lxml')
-        titres = soup.find('title')
-
-        return int(str(titres).split(' ')[5])
-
     @abstractmethod
     def get_url_articles(self, num_page) -> None:
         pass
@@ -29,20 +22,38 @@ class Article(ABC):
         pass
 
     @abstractmethod
-    def get_articles_en_liens(self, page) -> None:
-        pass
-
-    @abstractmethod
-    def get_contenu_articles(self, page) -> None:
-        pass
-
-    @abstractmethod
-    def get_liens_citations(self, page) -> None:
-        pass
-
-    @abstractmethod
     def get_auteurs_articles(self, page) -> None:
         pass
+
+    def get_articles_en_liens(self, page) -> None:
+        articles = page.find_all(class_='container-fluid')[1:]
+
+        for article in articles:
+            lien_article = []
+            liens = article.find(class_='related')
+            if liens is not None:
+                for lien in liens.find_all('a'):
+                    lien_article.append(lien.get('href'))
+            self.articles_en_lien.append(lien_article)
+
+    def get_contenu_articles(self, page) -> None:
+        articles = page.find_all('article')
+
+        for article in articles:
+            contenu = ''
+            for texte in article.find_all('p'):
+                contenu = f"{contenu} {texte.text}"
+            self.contenu_articles.append(unicodedata.normalize("NFKD", contenu))
+
+    def get_liens_citations(self, page) -> None:
+        articles = page.find_all(class_='container-fluid')[1:]
+
+        for article in articles:
+            lien_article = []
+            for lien in article.find(class_='texte').find_all('a'):
+                lien_article.append(lien.get('href'))
+            self.liens_citations.append(lien_article)
+
 
 
 if __name__ == '__main__':
