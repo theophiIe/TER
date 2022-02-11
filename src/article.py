@@ -55,6 +55,5 @@ class Article(ABC):
             self.liens_citations.append(lien_article)
 
 
-
 if __name__ == '__main__':
     pass
