@@ -1,3 +1,4 @@
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -19,28 +20,30 @@ def get_nombre_articles(page) -> int:
 
 
 def scrap_article_long():
-    article = ArticleLong()
-    pages = get_nombre_pages(article.url)
+    articles = ArticleLong()
+    pages = get_nombre_pages(articles.url)
 
     for num in range(1, pages + 1):
-        article.get_url_articles(num)
+        articles.get_url_articles(num)
 
     num_article = 0
 
-    while num_article < len(article.url_article):
-        page = BeautifulSoup(requests.get(article.url_article[num_article]).content, 'lxml')
+    while num_article < len(articles.url_article):
+        page = BeautifulSoup(requests.get(articles.url_article[num_article]).content, 'lxml')
 
-        article.get_titres_articles(page)
-        article.get_articles_en_liens(page)
-        article.get_auteurs_articles(page)
-        article.get_contenu_articles(page)
-        article.get_liens_citations(page)
+        articles.get_titres_articles(page)
+        articles.get_articles_en_liens(page)
+        articles.get_auteurs_articles(page)
+        articles.get_contenu_articles(page)
+        articles.get_liens_citations(page)
 
         print(get_nombre_articles(page))
         num_article += get_nombre_articles(page)
 
+    return articles
 
-def scrap_article_court() -> None:
+
+def scrap_article_court():
     articles = ArticleCourt()
     num_article = 0
     pages = get_nombre_pages(articles.url)
@@ -61,3 +64,5 @@ def scrap_article_court() -> None:
 
         print(get_nombre_articles(page))
         num_article += get_nombre_articles(page)
+
+    return articles
