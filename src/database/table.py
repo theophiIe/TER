@@ -1,37 +1,22 @@
-import datetime
-
 from sqlalchemy import Column, String, Date, ForeignKey, Table, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-"""ASSOCIATION TABLE"""
 
+class Auteur(Base):
+    __tablename__ = "t_auteur"
 
-References = Table('t_reference', Base.metadata,
-                   Column('url', ForeignKey('t_urlarticle.url'), primary_key=True),
-                   Column('article', ForeignKey('t_article.article_id'), primary_key=True)
-                   )
+    nom = Column(String, primary_key=True)
+    profession = Column(String)
 
-En_lien = Table('T_EnLien', Base.metadata,
-                Column('url', ForeignKey('t_urltexte.url'), primary_key=True),
-                Column('article', ForeignKey('t_article.article_id'), primary_key=True)
-                )
+    def __init__(self, nom, profession):
+        self.nom = nom
+        self.profession = profession
 
-
-class EcritPar(Base):
-    __tablename__ = "t_ecritpar"
-
-    auteur_id = Column(ForeignKey("t_auteur.nom"), primary_key=True)
-    article_id = Column(ForeignKey("t_article.article_id"), primary_key=True)
-    date_ecrit = Column(Date)
-
-    auteur = relationship("t_auteur", back_populates="articles")
-    article = relationship("t_article", back_populates="auteurs")
-
-
-"""TABLE ENTITEES"""
+    # Relationship avec EcritPar
+    parents_ecritpar = relationship("EcritPar", back_populates="child_ecritpar")
 
 
 class Article(Base):
@@ -41,39 +26,35 @@ class Article(Base):
     titre = Column(String(200), nullable=False, unique=True)
     type_article = Column(String(5), nullable=False)
     contenu = Column(String, nullable=False, unique=True)
+    etiquette = Column(String, nullable=True)
+    personnalite = Column(String)
+    lieu = Column(String)
 
-    etiquette = Column(String(20), unique=True, nullable=True)
-
-    personnalite = Column(String(50), nullable=True)
-    lieu = Column(String(100), nullable=True)
-
-    # Pour les auteurs
-    auteurs = relationship("t_ecritpar", back_populates="article")
-
-    # Pour les references dans le texte
-    reference = relationship("t_urltexte", secondary=References, back_populates="articles")
-
-    # Pour les articles en lien
-    articleEnLien = relationship("t_urlarticle", secondary=En_lien, back_populates="articles")
-
-    def __init__(self, titre: str, type_article: str, contenu: str, etiquette: str, personnalite: str, lieu: str):
+    def __init__(self, titre: str, type_article: str, contenu: str):
         self.titre = titre
         self.type_article = type_article
         self.contenu = contenu
-        self.etiquette = etiquette
-        self.personnalite = personnalite
-        self.lieu = lieu
+
+    # Relationship avec EcritPar
+    children_ecritpar = relationship("EcritPar", back_populates="parent_ecritpar")
+
+    # Relationship avec EnLien
+    children_enlien = relationship("EnLien", back_populates="parent_enlien")
+
+    # Relationship avec Reference
+    children_reference = relationship("Reference", back_populates="parent_reference")
 
 
-class UrlArticle(Base):
-    __tablename__ = "t_urlarticle"
+class UrlArticleEnLien(Base):
+    __tablename__ = "t_articleenlien"
 
     url = Column(String, primary_key=True)
 
-    articles = relationship("t_article", secondary=En_lien, back_populates="articleEnLien")
-
-    def __init__(self, url: str):
+    def __init__(self, url):
         self.url = url
+
+    # Relationship avec Enlien
+    parents_enlien = relationship("EnLien", back_populates="child_enlien")
 
 
 class UrlTexte(Base):
@@ -81,21 +62,70 @@ class UrlTexte(Base):
 
     url = Column(String, primary_key=True)
 
-    articles = relationship("t_article", secondary=References, back_populates="reference")
-
-    def __init__(self, url: str):
+    def __init__(self, url):
         self.url = url
 
+    # Relationship avec Reference
+    parents_reference = relationship("Reference", back_populates="child_reference")
 
-class Auteur(Base):
-    __tablename__ = "t_auteur"
 
-    nom = Column(String, primary_key=True)
-    profession = Column(String(200))
+class EcritPar(Base):
+    __tablename__ = "t_ecritpar"
 
-    # Relation avec la table d'association EcritPar
-    articles = relationship("t_ecritpar", back_populates="auteur")
+    # ForeignKey de Article
+    article_id = Column(ForeignKey('t_article.article_id'), primary_key=True)
 
-    def __init__(self, nom: str, profession):
-        self.nom = nom
-        self.profession = profession
+    # ForeignKey de Auteur
+    auteur_nom = Column(ForeignKey('t_auteur.nom'), primary_key=True)
+
+    date_ecriture = Column(String)
+
+    # Relationship de Article
+    child_ecritpar = relationship("Auteur", back_populates="parents_ecritpar")
+
+    # Relationship de Auteur
+    parent_ecritpar = relationship("Article", back_populates="children_ecritpar")
+
+    def __init__(self, article_id, auteur_nom):
+        self.article_id = article_id
+        self.auteur_nom = auteur_nom
+
+
+class EnLien(Base):
+    __tablename__ = "t_enlien"
+
+    # ForeignKey de Article
+    article_id = Column(ForeignKey('t_article.article_id'), primary_key=True)
+
+    # ForeignKey de UrlArticleEnLien
+    article_en_lien_url = Column(ForeignKey('t_articleenlien.url'), primary_key=True)
+
+    def __init__(self, article_id, article_url):
+        self.article_id = article_id
+        self.article_en_lien_url = article_url
+
+    # Relationship de Article
+    child_enlien = relationship("UrlArticleEnLien", back_populates="parents_enlien")
+
+    # Relationship de UrlArticleEnLien
+    parent_enlien = relationship("Article", back_populates="children_enlien")
+
+
+class Reference(Base):
+    __tablename__ = "t_reference"
+
+    # ForeignKey de Article
+    article_id = Column(ForeignKey('t_article.article_id'), primary_key=True)
+
+    # ForeignKey de UrlTexte
+    article_texte_url = Column(ForeignKey('t_urltexte.url'), primary_key=True)
+
+    def __init__(self, article_id, article_url):
+        self.article_id = article_id
+        self.article_texte_url = article_url
+
+    # Relationship de Article
+    child_reference = relationship("UrlTexte", back_populates="parents_reference")
+
+    # Relationship de UrlTexte
+    parent_reference = relationship("Article", back_populates="children_reference")
