@@ -5,9 +5,6 @@ from src.article import Article
 
 
 class ArticleLong(Article):
-    def __init__(self):
-        super().__init__()
-
     def get_url_articles(self, num_page) -> None:
         page = requests.get(f"{self.url}page/{str(num_page)}")
         soup = BeautifulSoup(page.content, 'lxml')
@@ -34,7 +31,3 @@ class ArticleLong(Article):
             for nom in noms:
                 auteurs.append(nom.split(',')[0].replace("Par", "").replace("par", ""))
             self.auteur_article.append(auteurs)
-
-
-if __name__ == '__main__':
-    pass

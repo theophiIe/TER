@@ -61,7 +61,3 @@ class ArticleCourt(Article):
             source.append(date_source.text.split(',')[0])
             self.source_citation.append(source)
             self.date_citation.append(date)
-
-
-if __name__ == '__main__':
-    pass

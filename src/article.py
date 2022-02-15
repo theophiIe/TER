@@ -53,7 +53,3 @@ class Article(ABC):
             for lien in article.find(class_='texte').find_all('a'):
                 lien_article.append(lien.get('href'))
             self.liens_citations.append(lien_article)
-
-
-if __name__ == '__main__':
-    pass
