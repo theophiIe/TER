@@ -9,6 +9,7 @@ class Article(ABC):
         self.url_article = []
         self.titre_article = []
         self.auteur_article = []
+        self.profession_auteur = []
         self.articles_en_lien = []
         self.contenu_articles = []
         self.liens_citations = []
@@ -23,6 +24,10 @@ class Article(ABC):
 
     @abstractmethod
     def get_auteurs_articles(self, page) -> None:
+        pass
+
+    @abstractmethod
+    def get_profession_auteurs(self, page) -> None:
         pass
 
     def get_articles_en_liens(self, page) -> None:

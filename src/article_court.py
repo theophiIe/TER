@@ -50,6 +50,21 @@ class ArticleCourt(Article):
                 auteurs.append(nom.split(',')[0])
             self.auteur_article.append(auteurs)
 
+    def get_profession_auteurs(self, page) -> None:
+        articles = page.find_all(class_='container-fluid')[1:]
+
+        for article in articles:
+            metier = []
+            auteur = article.find(class_='auteur')
+            professions = auteur.text.split("//")
+
+            for profession in professions:
+                try:
+                    metier.append(profession.split(',')[1])
+                except:
+                    metier.append("Média")
+            self.profession_auteur.append(metier)
+
     def get_source_date_citation(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
 

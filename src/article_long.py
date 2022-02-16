@@ -31,3 +31,17 @@ class ArticleLong(Article):
             for nom in noms:
                 auteurs.append(nom.split(',')[0].replace("Par", "").replace("par", ""))
             self.auteur_article.append(auteurs)
+
+    def get_profession_auteurs(self, page) -> None:
+        articles = page.find_all(class_='container-fluid')[1:]
+
+        for article in articles:
+            metier = []
+            auteur = article.find('h2')
+            professions = auteur.text.split("//")
+            for profession in professions:
+                try:
+                    metier.append(profession.split(',')[1])
+                except:
+                    metier.append("Média")
+            self.profession_auteur.append(metier)

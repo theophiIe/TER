@@ -34,6 +34,7 @@ def scrap_article_long():
         articles.get_titres_articles(page)
         articles.get_articles_en_liens(page)
         articles.get_auteurs_articles(page)
+        articles.get_profession_auteurs(page)
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
 
@@ -58,6 +59,7 @@ def scrap_article_court():
         articles.get_etiquette_articles(page)
         articles.get_articles_en_liens(page)
         articles.get_auteurs_articles(page)
+        articles.get_profession_auteurs(page)
         articles.get_source_date_citation(page)
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
