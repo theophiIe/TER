@@ -58,14 +58,19 @@ def insert_url_lien(session, element, article, articles):
 
 
 def insert_url_ref(session, element, article, articles):
-    for url in articles.articles_en_lien[element]:
-        q = session.query(UrlTexte).filter(UrlTexte.url == url)
-        if not session.query(q.exists()).scalar():
-            url_texte = UrlTexte(url)
-            insert(session, url_texte)
+    for url in articles.liens_citations[element]:
+        if url is not None:
+            q = session.query(UrlTexte).filter(UrlTexte.url == url)
+            if not session.query(q.exists()).scalar():
+                url_texte = UrlTexte(url)
+                insert(session, url_texte)
 
-        reference = Reference(article.article_id, url)
-        insert(session, reference)
+            # Permet de vérifier que dans un meme article, un url n'apparait qu'une et une seule fois
+            q = session.query(Reference)\
+                .filter(Reference.article_texte_url == url).filter(Reference.article_id == article.article_id)
+            if not session.query(q.exists()).scalar():
+                reference = Reference(article.article_id, url)
+                insert(session, reference)
 
 
 def remplissage(engine, articles):
@@ -85,4 +90,3 @@ if __name__ == '__main__':
     print("Remplir")
     remplissage(engines, articles_court)
     print("Fin")
-
