@@ -42,7 +42,10 @@ def insert_article(session, element, articles):
 
 def insert_ecritpar(session, element, article, articles):
     for auteur in articles.auteur_article[element]:
-        ecrit_par = EcritPar(article.article_id, auteur)
+        if articles.date_ecriture[element][0] is None:
+            ecrit_par = EcritPar(article.article_id, auteur, None)
+        else:
+            ecrit_par = EcritPar(article.article_id, auteur, articles.date_ecriture[element][0])
         insert(session, ecrit_par)
 
 

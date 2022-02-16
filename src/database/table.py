@@ -88,9 +88,10 @@ class EcritPar(Base):
     # Relationship de Auteur
     parent_ecritpar = relationship("Article", back_populates="children_ecritpar")
 
-    def __init__(self, article_id, auteur_nom):
+    def __init__(self, article_id, auteur_nom, date_ecriture):
         self.article_id = article_id
         self.auteur_nom = auteur_nom
+        self.date_ecriture = date_ecriture
 
 
 class EnLien(Base):

@@ -13,6 +13,7 @@ class Article(ABC):
         self.articles_en_lien = []
         self.contenu_articles = []
         self.liens_citations = []
+        self.date_ecriture = []
 
     @abstractmethod
     def get_url_articles(self, num_page) -> None:
@@ -28,6 +29,10 @@ class Article(ABC):
 
     @abstractmethod
     def get_profession_auteurs(self, page) -> None:
+        pass
+
+    @abstractmethod
+    def get_date_ecriture(self, page) -> None:
         pass
 
     def get_articles_en_liens(self, page) -> None:

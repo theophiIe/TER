@@ -1,4 +1,3 @@
-
 import requests
 from bs4 import BeautifulSoup
 
@@ -63,6 +62,7 @@ def scrap_article_court():
         articles.get_source_date_citation(page)
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
+        articles.get_date_ecriture(page)
 
         print(get_nombre_articles(page))
         num_article += get_nombre_articles(page)

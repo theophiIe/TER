@@ -61,7 +61,7 @@ class ArticleCourt(Article):
             for profession in professions:
                 try:
                     metier.append(profession.split(',')[1])
-                except:
+                except Exception:
                     metier.append("Média")
             self.profession_auteur.append(metier)
 
@@ -76,3 +76,13 @@ class ArticleCourt(Article):
             source.append(date_source.text.split(',')[0])
             self.source_citation.append(source)
             self.date_citation.append(date)
+
+    def get_date_ecriture(self, page) -> None:
+        articles = page.find_all(class_='container-fluid')[1:]
+
+        for article in articles:
+            date = []
+            auteur = article.find(class_='auteur')
+            date.append(re.findall(r"(\d{1,2} (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre"
+                                   r"|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
+            self.date_ecriture.append(date)
