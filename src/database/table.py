@@ -23,17 +23,19 @@ class Article(Base):
     __tablename__ = "t_article"
 
     article_id = Column(Integer, primary_key=True, autoincrement=True)
-    titre = Column(String(200), nullable=False, unique=True)
+    titre = Column(String, nullable=False, unique=True)
     type_article = Column(String(5), nullable=False)
-    contenu = Column(String, nullable=False, unique=True)
+    contenu = Column(String, nullable=False)
     etiquette = Column(String, nullable=True)
     personnalite = Column(String)
     lieu = Column(String)
 
-    def __init__(self, titre: str, type_article: str, contenu: str):
+    def __init__(self, titre: str, type_article: str, contenu: str, etiquette: str, personnalite: str):
         self.titre = titre
         self.type_article = type_article
         self.contenu = contenu
+        self.etiquette = etiquette
+        self.personnalite = personnalite
 
     # Relationship avec EcritPar
     children_ecritpar = relationship("EcritPar", back_populates="parent_ecritpar")

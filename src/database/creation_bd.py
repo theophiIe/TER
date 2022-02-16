@@ -2,57 +2,87 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 
+from src.scrapping import scrap_article_court
 from table import Base, Auteur, Article, EcritPar, UrlArticleEnLien, EnLien, UrlTexte, Reference
 
-engine = create_engine(f"postgresql://postgres@/lessurligneurs")
-print(database_exists(engine.url))
-if not database_exists(engine.url):
-    create_database(engine.url)
 
-print(database_exists(engine.url))
+def connexion(user: str, pwd: str, host="localhost", port="5432", name="lessurligneurs"):
+    engine = create_engine(f"postgresql://{user}:{pwd}@{host}:{port}/{name}")
+    if not database_exists(engine.url):
+        create_database(engine.url)
 
-Base.metadata.create_all(engine)
-auteur = Auteur("Jojo", "chomeur")
-article = Article("blabla", "long", "bonjour mesdames")
-article2 = Article("blbl", "long", " mesdames")
+    Base.metadata.create_all(engine)
 
-with Session(bind=engine) as session:
+    return engine
 
-    session.add(auteur)
-    session.add(article)
-    session.add(article2)
+
+def insert(session, valeur):
+    session.add(valeur)
     session.commit()
 
-    ecritpar = EcritPar(article.article_id, auteur.nom)
-    ecritpar2 = EcritPar(article2.article_id, auteur.nom)
-    session.add(ecritpar)
-    session.add(ecritpar2)
-    session.commit()
 
-    articleenlien = UrlArticleEnLien("https://test1/")
-    articleenlien2 = UrlArticleEnLien("https://test2")
-    session.add(articleenlien)
-    session.add(articleenlien2)
-    session.commit()
+def insert_auteur(session, element, articles):
+    for auteur in articles.auteur_article[element]:
+        q = session.query(Auteur).filter(Auteur.nom == auteur)
+        if not session.query(q.exists()).scalar():
+            insert(session, Auteur(auteur, "à modifier"))
 
-    enlien = EnLien(article.article_id, articleenlien.url)
-    enlien2 = EnLien(article2.article_id, articleenlien2.url)
-    session.add(enlien)
-    session.add(enlien2)
-    session.commit()
 
-    urltexte = UrlTexte("https://test3/")
-    urltexte2 = UrlTexte("https://test4/")
-    session.add(urltexte)
-    session.add(urltexte2)
-    session.commit()
+def insert_article(session, element, articles):
+    article = Article(articles.titre_article[element],
+                      "court",
+                      "à modifier",
+                      articles.etiquette[element],
+                      articles.auteur_article[element])
 
-    reference = Reference(article.article_id, urltexte.url)
-    reference2 = Reference(article.article_id, urltexte2.url)
-    session.add(reference)
-    session.add(reference2)
-    session.commit()
+    insert(session, article)
+
+    return article
+
+
+def insert_ecritpar(session, element, article, articles):
+    for auteur in articles.auteur_article[element]:
+        ecrit_par = EcritPar(article.article_id, auteur)
+        insert(session, ecrit_par)
+
+
+def insert_url_lien(session, element, article, articles):
+    for url in articles.articles_en_lien[element]:
+        q = session.query(UrlArticleEnLien).filter(UrlArticleEnLien.url == url)
+        if not session.query(q.exists()).scalar():
+            url_enlien = UrlArticleEnLien(url)
+            insert(session, url_enlien)
+
+        enlien = EnLien(article.article_id, url)
+        insert(session, enlien)
+
+
+def insert_url_ref(session, element, article, articles):
+    for url in articles.articles_en_lien[element]:
+        q = session.query(UrlTexte).filter(UrlTexte.url == url)
+        if not session.query(q.exists()).scalar():
+            url_texte = UrlTexte(url)
+            insert(session, url_texte)
+
+        reference = Reference(article.article_id, url)
+        insert(session, reference)
+
+
+def remplissage(engine, articles):
+    with Session(bind=engine) as session:
+        for element in range(len(articles.url_article)):
+            insert_auteur(session, element, articles)
+            article = insert_article(session, element, articles)
+            insert_ecritpar(session, element, article, articles)
+            insert_url_lien(session, element, article, articles)
+            insert_url_ref(session, element, article, articles)
 
 
 if __name__ == '__main__':
-    pass
+    articles_court = scrap_article_court()
+    print("Connexion")
+    engines = connexion("theophile", "postgres", "localhost", "5432", "lessurligneurs")
+    print("Remplir")
+    remplissage(engines, articles_court)
+    print("Fin")
+
