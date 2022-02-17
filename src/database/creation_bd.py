@@ -25,7 +25,7 @@ def insert_auteur(session, element, articles):
     for auteur in articles.auteur_article[element]:
         q = session.query(Auteur).filter(Auteur.nom == auteur)
         if not session.query(q.exists()).scalar():
-            insert(session, Auteur(auteur, "à modifier"))
+            insert(session, Auteur(auteur, articles.profession_auteur[element][0]))
 
 
 def insert_article(session, element, articles):
@@ -89,7 +89,7 @@ def remplissage(engine, articles):
 if __name__ == '__main__':
     articles_court = scrap_article_court()
     print("Connexion")
-    engines = connexion("theophile", "postgres", "localhost", "5432", "lessurligneurs")
+    engines = connexion("postgres", "postgres", "localhost", "5432", "lessurligneurs")
     print("Remplir")
     remplissage(engines, articles_court)
     print("Fin")
