@@ -44,10 +44,35 @@ class ArticleCourt(Article):
         for article in articles:
             auteurs = []
             auteur = article.find(class_='auteur')
-            noms = auteur.text.split("//")
+            noms = auteur.text.split("// ")
 
             for nom in noms:
-                auteurs.append(nom.split(',')[0])
+                if nom[0:1] == " ":
+                    # Permet de supprimer les espaces au début
+                    nom = nom[1:].split(', ')[0]
+                elif nom.startswith("Par ") or nom.startswith("par "):
+                    # Permet de supprimer les "par" et "Par"
+                    nom = nom[4:].split(', ')[0]
+                elif len(nom.split(' ,')) < 0:
+                    # PARCE QUE CE SITE EST CODE AVEC LES YEUX FERME
+                    nom = nom.split(' ,')[0]
+                elif re.search("(\d{1,2} (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre"
+                               r"|novembre|décembre)[ ]*[0-9]{0,4})", nom) and len(noms) > 1:
+                    # Permet de supprimer les qui se serait glisse dans les auteur
+                    # tout en assurant que les articles ayant un seul auteur soit dans la BDD
+                    continue
+                else:
+                    # CE SITE C'EST UNE BLAGUE EN FAIT
+                    if len(nom.split(', ')) > 1:
+                        nom = nom.split(', ')[0]
+                    else:
+                        nom = nom.split(' ,')[0]
+
+                if " et " in nom:
+                    for i in range(len(nom.split(' et '))):
+                        auteurs.append(nom.split(' et ')[i])
+                else:
+                    auteurs.append(nom)
             self.auteur_article.append(auteurs)
 
     def get_profession_auteurs(self, page) -> None:
