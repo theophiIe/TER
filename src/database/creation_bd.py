@@ -26,7 +26,11 @@ def insert_auteur(session, element, articles):
     for auteur in articles.auteur_article[element]:
         q = session.query(Auteur).filter(Auteur.nom == auteur)
         if not session.query(q.exists()).scalar():
-            insert(session, Auteur(auteur, articles.profession_auteur[element][0]))
+            if articles.lieu_profession[element][0] is None:
+                aut = Auteur(auteur, articles.profession_auteur[element][0], None)
+            else:
+                aut = Auteur(auteur, articles.profession_auteur[element][0], articles.lieu_profession[element][0])
+            insert(session, aut)
 
 
 def insert_article_court(session, element, articles):
