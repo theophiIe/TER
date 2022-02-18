@@ -2,11 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 
-from src.scrapping import scrap_article_court
-from table import Base, Auteur, Article, EcritPar, UrlArticleEnLien, EnLien, UrlTexte, Reference
+from src.article_court import ArticleCourt
+from src.article_long import ArticleLong
+from src.database.table import Base, Auteur, Article, EcritPar, UrlArticleEnLien, EnLien, UrlTexte, Reference
 
 
-def connexion(user: str, pwd: str, host="localhost", port="5432", name="lessurligneurs"):
+def connexion(user, pwd, host, port, name):
     engine = create_engine(f"postgresql://{user}:{pwd}@{host}:{port}/{name}")
     if not database_exists(engine.url):
         create_database(engine.url)
@@ -28,11 +29,23 @@ def insert_auteur(session, element, articles):
             insert(session, Auteur(auteur, articles.profession_auteur[element][0]))
 
 
-def insert_article(session, element, articles):
+def insert_article_court(session, element, articles):
     article = Article(articles.titre_article[element],
                       "court",
                       "à modifier",
                       articles.etiquette[element],
+                      articles.auteur_article[element])
+
+    insert(session, article)
+
+    return article
+
+
+def insert_article_long(session, element, articles):
+    article = Article(articles.titre_article[element],
+                      "long",
+                      "à modifier",
+                      "None",
                       articles.auteur_article[element])
 
     insert(session, article)
@@ -79,17 +92,11 @@ def insert_url_ref(session, element, article, articles):
 def remplissage(engine, articles):
     with Session(bind=engine) as session:
         for element in range(len(articles.url_article)):
+            if isinstance(articles, ArticleCourt):
+                article = insert_article_court(session, element, articles)
+            elif isinstance(articles, ArticleLong):
+                article = insert_article_long(session, element, articles)
             insert_auteur(session, element, articles)
-            article = insert_article(session, element, articles)
             insert_ecritpar(session, element, article, articles)
             insert_url_lien(session, element, article, articles)
             insert_url_ref(session, element, article, articles)
-
-
-if __name__ == '__main__':
-    articles_court = scrap_article_court()
-    print("Connexion")
-    engines = connexion("postgres", "postgres", "localhost", "5432", "lessurligneurs")
-    print("Remplir")
-    remplissage(engines, articles_court)
-    print("Fin")
