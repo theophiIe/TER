@@ -95,3 +95,19 @@ class ArticleCourt(Article):
             date.append(re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
                                    r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
             self.date_ecriture.append(date)
+
+    # ERREUR !!
+    def get_lieu_profession(self, page) -> None:
+        articles = page.find_all(class_='container-fluid')[1:]
+
+        for article in articles:
+            lieu = []
+            auteur = article.find(class_='auteur')
+
+            sentence = Sentence(auteur.text)
+            self.tagger.predict(sentence)
+            for entity in sentence.get_spans('ner'):
+                if entity.tag == 'LOC':
+                    lieu.append(entity.to_plain_string())
+
+            self.lieu_profession.append(lieu)
