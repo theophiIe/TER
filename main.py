@@ -1,7 +1,7 @@
 import argparse
 
 from src.database.creation_bd import connexion, remplissage
-from src.scrapping import scrap_article_court, scrap_article_long
+from src.extracteur.scrapping import scrap_article_court, scrap_article_long
 
 
 def main(user, pwd, host, port, db):

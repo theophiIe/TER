@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
-from src.article_court import ArticleCourt
-from src.article_long import ArticleLong
+from src.extracteur.article_court import ArticleCourt
+from src.extracteur.article_long import ArticleLong
 
 
 def get_nombre_pages(url) -> int:

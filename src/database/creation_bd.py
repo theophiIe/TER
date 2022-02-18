@@ -2,8 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 
-from src.article_court import ArticleCourt
-from src.article_long import ArticleLong
+from src.extracteur.article_court import ArticleCourt
+from src.extracteur.article_long import ArticleLong
 from src.database.table import Base, Auteur, Article, EcritPar, UrlArticleEnLien, EnLien, UrlTexte, Reference
 
 
