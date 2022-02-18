@@ -63,7 +63,10 @@ def scrap_article_court():
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
         articles.get_date_ecriture(page)
+        articles.get_lieu_profession(page)
 
         num_article += get_nombre_articles(page)
+
+        print("Next Page")
 
     return articles
