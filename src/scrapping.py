@@ -36,8 +36,8 @@ def scrap_article_long():
         articles.get_profession_auteurs(page)
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
+        articles.get_date_ecriture(page)
 
-        print(get_nombre_articles(page))
         num_article += get_nombre_articles(page)
 
     return articles
@@ -64,7 +64,6 @@ def scrap_article_court():
         articles.get_liens_citations(page)
         articles.get_date_ecriture(page)
 
-        print(get_nombre_articles(page))
         num_article += get_nombre_articles(page)
 
     return articles
