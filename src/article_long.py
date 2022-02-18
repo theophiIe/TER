@@ -1,3 +1,5 @@
+import re
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -28,8 +30,31 @@ class ArticleLong(Article):
             auteurs = []
             auteur = article.find('h2')
             noms = auteur.text.split("//")
+
             for nom in noms:
-                auteurs.append(nom.split(',')[0].replace("Par", "").replace("par", ""))
+                if nom[0:1] == " ":
+                    # Permet de supprimer les espaces au début
+                    nom = nom[1:].split(', ')[0]
+                elif nom.startswith("Par ") or nom.startswith("par "):
+                    # Permet de supprimer les "par" et "Par"
+                    nom = nom[4:].split(', ')[0]
+                elif len(nom.split(' ,')) < 0:
+                    nom = nom.split(' ,')[0]
+                elif re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre"
+                               r"|novembre|décembre)[ ]*[0-9]{0,4})", nom) and len(noms) > 1:
+                    # Permet de supprimer les qui se serait glisse dans les auteur
+                    # tout en assurant que les articles ayant un seul auteur soit dans la BDD
+                    continue
+                else:
+                    if len(nom.split(', ')) > 1:
+                        nom = nom.split(', ')[0]
+                    else:
+                        nom = nom.split(' ,')[0]
+                if " et " in nom:
+                    for i in range(len(nom.split(' et '))):
+                        auteurs.append(nom.split(' et ')[i])
+                else:
+                    auteurs.append(nom)
             self.auteur_article.append(auteurs)
 
     def get_profession_auteurs(self, page) -> None:
@@ -42,6 +67,16 @@ class ArticleLong(Article):
             for profession in professions:
                 try:
                     metier.append(profession.split(',')[1])
-                except:
+                except Exception:
                     metier.append("Média")
             self.profession_auteur.append(metier)
+
+    def get_date_ecriture(self, page) -> None:
+        articles = page.find_all(class_='container-fluid')[1:]
+
+        for article in articles:
+            date = []
+            date_ecriture = article.find('h2')
+            date.append(re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                                   r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", date_ecriture.text))
+            self.date_ecriture.append(date)
