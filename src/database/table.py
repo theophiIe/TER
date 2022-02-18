@@ -10,10 +10,12 @@ class Auteur(Base):
 
     nom = Column(String, primary_key=True)
     profession = Column(String)
+    lieu = Column(String)
 
-    def __init__(self, nom, profession):
+    def __init__(self, nom, profession, lieu):
         self.nom = nom
         self.profession = profession
+        self.lieu = lieu
 
     # Relationship avec EcritPar
     parents_ecritpar = relationship("EcritPar", back_populates="child_ecritpar")
