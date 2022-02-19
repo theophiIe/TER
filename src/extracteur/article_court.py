@@ -46,6 +46,7 @@ class ArticleCourt(Article):
 
         for article in articles:
             auteurs = []
+            lieu_buffer = []
             auteur = article.find(class_='auteur')
 
             if auteur.text != '':
@@ -54,8 +55,11 @@ class ArticleCourt(Article):
                 for entity in sentence.get_spans('ner'):
                     if entity.tag == 'PER':
                         auteurs.append(entity.to_plain_string())
+                    if entity.tag == 'LOC':
+                        lieu_buffer.append(entity.to_plain_string())
 
             self.auteur_article.append(auteurs)
+            self.lieu_profession.append(lieu_buffer)
 
     def get_profession_auteurs(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
@@ -113,10 +117,13 @@ class ArticleCourt(Article):
 
     def get_personnalite(self, titre: str) -> None:
         personnalite = []
-        sentence = Sentence(titre)
+        buffer = titre.replace("TotalEnergies", " ").replace("procès", " ").replace("au président de la République", "Emmanuel Macron").replace("Frexit", " ").replace("StopCovid", " ")
+        sentence = Sentence(buffer)
         self.tagger.predict(sentence)
         for entity in sentence.get_spans('ner'):
             if entity.tag == 'PER':
-                personnalite.append(entity.to_plain_string())
+                tmp = entity.to_plain_string()
+                if len(tmp) > 2 :
+                    personnalite.append(tmp)
 
         self.personnalites.append(personnalite)
