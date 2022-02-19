@@ -8,7 +8,10 @@ from flair.data import Sentence
 from src.extracteur.article import Article
 
 
-class ArticleLong(Article, ABC):
+class ArticleLong(Article):
+    def __init__(self, tagger):
+        super().__init__(tagger)
+
     def get_url_articles(self, num_page) -> None:
         page = requests.get(f"{self.url}page/{str(num_page)}")
         soup = BeautifulSoup(page.content, 'lxml')
