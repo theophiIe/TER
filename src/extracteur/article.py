@@ -38,10 +38,6 @@ class Article(ABC):
     def get_date_ecriture(self, page) -> None:
         pass
 
-    # @abstractmethod
-    # def get_lieu_profession(self, page) -> None:
-    #     pass
-
     def get_articles_en_liens(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
 
