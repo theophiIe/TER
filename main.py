@@ -1,14 +1,18 @@
 import argparse
 
+from flair.models import SequenceTagger
+
 from src.database.creation_bd import connexion, remplissage
 from src.extracteur.scrapping import scrap_article_court, scrap_article_long
 
 
 def main(user, pwd, host, port, db):
+    print("Chargement de Flair french")
+    tagger = SequenceTagger.load("flair/ner-french")
     print("Scrapping information article court")
-    articles_court = scrap_article_court()
+    articles_court = scrap_article_court(tagger)
     print("Scrapping information article long")
-    articles_long = scrap_article_long()
+    articles_long = scrap_article_long(tagger)
     print("Connexion")
     engines = connexion(user, pwd, host, port, db)
     print("Remplir article court")
