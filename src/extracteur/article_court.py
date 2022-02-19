@@ -1,24 +1,20 @@
 import re
-
 import requests
-from bs4 import BeautifulSoup
 
+from bs4 import BeautifulSoup
 from flair.data import Sentence
-from flair.models import SequenceTagger
 
 from src.extracteur.article import Article
 
 
 class ArticleCourt(Article):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, tagger):
+        super().__init__(tagger)
 
         self.etiquette = []
         self.source_citation = []
         self.date_citation = []
-
-        # Loading tagger
-        self.tagger = SequenceTagger.load("flair/ner-french")
+        self.personnalite = []
 
     def get_url_articles(self, num_page) -> None:
         page = requests.get(f"{self.url}page/{str(num_page)}")
@@ -36,6 +32,7 @@ class ArticleCourt(Article):
             for titre in article.find_all('h1'):
                 if titre.text != '':
                     self.titre_article.append(titre.text)
+                    self.get_personnalite(titre.text)
 
     def get_etiquette_articles(self, page) -> None:
         articles = page.find_all('article')
@@ -51,11 +48,12 @@ class ArticleCourt(Article):
             auteurs = []
             auteur = article.find(class_='auteur')
 
-            sentence = Sentence(auteur.text)
-            self.tagger.predict(sentence)
-            for entity in sentence.get_spans('ner'):
-                if entity.tag == 'PER':
-                    auteurs.append(entity.to_plain_string())
+            if auteur.text == '':
+                sentence = Sentence(auteur.text)
+                self.tagger.predict(sentence)
+                for entity in sentence.get_spans('ner'):
+                    if entity.tag == 'PER':
+                        auteurs.append(entity.to_plain_string())
 
             self.auteur_article.append(auteurs)
 
@@ -96,7 +94,7 @@ class ArticleCourt(Article):
                                    r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
             self.date_ecriture.append(date)
 
-    # ERREUR !!
+    # ERREUR !! (revoir la bd pour remplir correctement les professions en fonction des auteurs)
     def get_lieu_profession(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
 
@@ -104,10 +102,22 @@ class ArticleCourt(Article):
             lieu = []
             auteur = article.find(class_='auteur')
 
-            sentence = Sentence(auteur.text)
-            self.tagger.predict(sentence)
-            for entity in sentence.get_spans('ner'):
-                if entity.tag == 'LOC':
-                    lieu.append(entity.to_plain_string())
+            if auteur.text != '':
+                sentence = Sentence(auteur.text)
+                self.tagger.predict(sentence)
+                for entity in sentence.get_spans('ner'):
+                    if entity.tag == 'LOC':
+                        lieu.append(entity.to_plain_string())
 
             self.lieu_profession.append(lieu)
+
+    def get_personnalite(self, titre: str) -> None:
+        print(titre)
+        personnalite = []
+        sentence = Sentence(titre)
+        self.tagger.predict(sentence)
+        for entity in sentence.get_spans('ner'):
+            if entity.tag == 'PER':
+                personnalite.append(entity.to_plain_string())
+
+        self.personnalite.append(personnalite)

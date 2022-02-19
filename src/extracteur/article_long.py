@@ -1,12 +1,14 @@
 import re
-
 import requests
+
+from abc import ABC
 from bs4 import BeautifulSoup
+from flair.data import Sentence
 
 from src.extracteur.article import Article
 
 
-class ArticleLong(Article):
+class ArticleLong(Article, ABC):
     def get_url_articles(self, num_page) -> None:
         page = requests.get(f"{self.url}page/{str(num_page)}")
         soup = BeautifulSoup(page.content, 'lxml')
@@ -29,32 +31,14 @@ class ArticleLong(Article):
         for article in articles:
             auteurs = []
             auteur = article.find('h2')
-            noms = auteur.text.split("//")
 
-            for nom in noms:
-                if nom[0:1] == " ":
-                    # Permet de supprimer les espaces au début
-                    nom = nom[1:].split(', ')[0]
-                elif nom.startswith("Par ") or nom.startswith("par "):
-                    # Permet de supprimer les "par" et "Par"
-                    nom = nom[4:].split(', ')[0]
-                elif len(nom.split(' ,')) < 0:
-                    nom = nom.split(' ,')[0]
-                elif re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre"
-                               r"|novembre|décembre)[ ]*[0-9]{0,4})", nom) and len(noms) > 1:
-                    # Permet de supprimer les qui se serait glisse dans les auteur
-                    # tout en assurant que les articles ayant un seul auteur soit dans la BDD
-                    continue
-                else:
-                    if len(nom.split(', ')) > 1:
-                        nom = nom.split(', ')[0]
-                    else:
-                        nom = nom.split(' ,')[0]
-                if " et " in nom:
-                    for i in range(len(nom.split(' et '))):
-                        auteurs.append(nom.split(' et ')[i])
-                else:
-                    auteurs.append(nom)
+            if auteur.text == '':
+                sentence = Sentence(auteur.text)
+                self.tagger.predict(sentence)
+                for entity in sentence.get_spans('ner'):
+                    if entity.tag == 'PER':
+                        auteurs.append(entity.to_plain_string())
+
             self.auteur_article.append(auteurs)
 
     def get_profession_auteurs(self, page) -> None:
