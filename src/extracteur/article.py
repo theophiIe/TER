@@ -38,9 +38,9 @@ class Article(ABC):
     def get_date_ecriture(self, page) -> None:
         pass
 
-    @abstractmethod
-    def get_lieu_profession(self, page) -> None:
-        pass
+    # @abstractmethod
+    # def get_lieu_profession(self, page) -> None:
+    #     pass
 
     def get_articles_en_liens(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
@@ -57,10 +57,10 @@ class Article(ABC):
         articles = page.find_all('article')
 
         for article in articles:
-            contenu = ''
+            contenu = []
             for texte in article.find_all('p'):
-                contenu = f"{contenu} {texte.text}"
-            self.contenu_articles.append(unicodedata.normalize("NFKD", contenu))
+                contenu.append(unicodedata.normalize("NFKD", texte.text))
+            self.contenu_articles.append(contenu)
 
     def get_liens_citations(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
