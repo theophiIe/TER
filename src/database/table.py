@@ -176,11 +176,11 @@ class Contenu(Base):
     # ForeignKey de Article
     article_id = Column(ForeignKey('t_article.article_id'), primary_key=True)
 
-    contenu = Column(String, primary_key=True)
+    contenu_article = Column(String, primary_key=True)
 
-    def __init__(self, article_id, contenu):
+    def __init__(self, article_id, contenus):
         self.article_id = article_id
-        self.contenu = contenu
+        self.contenu_article = contenus
 
     # Relationship de Article
     parents_contenu = relationship("Article", back_populates="children_contenu")
