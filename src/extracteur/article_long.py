@@ -32,7 +32,7 @@ class ArticleLong(Article, ABC):
             auteurs = []
             auteur = article.find('h2')
 
-            if auteur.text == '':
+            if auteur.text != '':
                 sentence = Sentence(auteur.text)
                 self.tagger.predict(sentence)
                 for entity in sentence.get_spans('ner'):
