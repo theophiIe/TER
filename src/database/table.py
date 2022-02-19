@@ -21,32 +21,46 @@ class Auteur(Base):
     parents_ecritpar = relationship("EcritPar", back_populates="child_ecritpar")
 
 
+class Personnalite(Base):
+    __tablename__ = "t_personnalite"
+
+    nom = Column(String, primary_key=True)
+
+    def __init__(self, nom):
+        self.nom = nom
+
+    # Relationship avec ParleDe
+    parents_parlede = relationship("ParleDe", back_populates="child_parlede")
+
+
 class Article(Base):
     __tablename__ = "t_article"
 
     article_id = Column(Integer, primary_key=True, autoincrement=True)
     titre = Column(String, nullable=False, unique=True)
     type_article = Column(String(5), nullable=False)
-    contenu = Column(String, nullable=False)
     etiquette = Column(String, nullable=True)
-    personnalite = Column(String)
     lieu = Column(String)
 
-    def __init__(self, titre: str, type_article: str, contenu: str, etiquette: str, personnalite: str):
+    def __init__(self, titre: str, type_article: str, etiquette: str):
         self.titre = titre
         self.type_article = type_article
-        self.contenu = contenu
         self.etiquette = etiquette
-        self.personnalite = personnalite
 
     # Relationship avec EcritPar
     children_ecritpar = relationship("EcritPar", back_populates="parent_ecritpar")
+
+    # Relationship avec ParleDe
+    children_parlede = relationship("ParleDe", back_populates="parent_parlede")
 
     # Relationship avec EnLien
     children_enlien = relationship("EnLien", back_populates="parent_enlien")
 
     # Relationship avec Reference
     children_reference = relationship("Reference", back_populates="parent_reference")
+
+    # Relationship avec Contenu
+    children_contenu = relationship("Contenu", back_populates="parents_contenu")
 
 
 class UrlArticleEnLien(Base):
@@ -96,6 +110,26 @@ class EcritPar(Base):
         self.date_ecriture = date_ecriture
 
 
+class ParleDe(Base):
+    __tablename__ = "t_parlede"
+
+    # ForeignKey de Article
+    article_id = Column(ForeignKey('t_article.article_id'), primary_key=True)
+
+    # ForeignKey de Personnalite
+    personnalite_nom = Column(ForeignKey('t_personnalite.nom'), primary_key=True)
+
+    # Relationship de Article
+    child_parlede = relationship("Personnalite", back_populates="parents_parlede")
+
+    # Relationship de Personnalite
+    parent_parlede = relationship("Article", back_populates="children_parlede")
+
+    def __init__(self, article_id, personnalite_nom):
+        self.article_id = article_id
+        self.personnalite_nom = personnalite_nom
+
+
 class EnLien(Base):
     __tablename__ = "t_enlien"
 
@@ -134,3 +168,19 @@ class Reference(Base):
 
     # Relationship de UrlTexte
     parent_reference = relationship("Article", back_populates="children_reference")
+
+
+class Contenu(Base):
+    __tablename__ = "t_contenu"
+
+    # ForeignKey de Article
+    article_id = Column(ForeignKey('t_article.article_id'), primary_key=True)
+
+    contenu = Column(String, primary_key=True)
+
+    def __init__(self, article_id, contenu):
+        self.article_id = article_id
+        self.contenu = contenu
+
+    # Relationship de Article
+    parents_contenu = relationship("Article", back_populates="children_contenu")
