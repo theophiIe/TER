@@ -98,32 +98,20 @@ class ArticleCourt(Article):
                                    r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
             self.date_ecriture.append(date)
 
-    # ERREUR !! (revoir la bd pour remplir correctement les professions en fonction des auteurs)
-    # def get_lieu_profession(self, page) -> None:
-    #     articles = page.find_all(class_='container-fluid')[1:]
-    #
-    #     for article in articles:
-    #         lieu = []
-    #         auteur = article.find(class_='auteur')
-    #
-    #         if auteur.text != '':
-    #             sentence = Sentence(auteur.text)
-    #             self.tagger.predict(sentence)
-    #             for entity in sentence.get_spans('ner'):
-    #                 if entity.tag == 'LOC':
-    #                     lieu.append(entity.to_plain_string())
-    #
-    #         self.lieu_profession.append(lieu)
-
     def get_personnalite(self, titre: str) -> None:
         personnalite = []
-        buffer = titre.replace("TotalEnergies", " ").replace("procès", " ").replace("au président de la République", "Emmanuel Macron").replace("Frexit", " ").replace("StopCovid", " ")
+        buffer = titre.replace("TotalEnergies", " ")\
+            .replace("procès", " ")\
+            .replace("au président de la République", "Emmanuel Macron")\
+            .replace("Frexit", " ")\
+            .replace("StopCovid", " ")
+
         sentence = Sentence(buffer)
         self.tagger.predict(sentence)
         for entity in sentence.get_spans('ner'):
             if entity.tag == 'PER':
                 tmp = entity.to_plain_string()
-                if len(tmp) > 2 :
+                if len(tmp) > 2:
                     personnalite.append(tmp)
 
         self.personnalites.append(personnalite)
