@@ -14,7 +14,7 @@ class ArticleCourt(Article):
         self.etiquette = []
         self.source_citation = []
         self.date_citation = []
-        self.personnalite = []
+        self.personnalites = []
 
     def get_url_articles(self, num_page) -> None:
         page = requests.get(f"{self.url}page/{str(num_page)}")
@@ -48,7 +48,7 @@ class ArticleCourt(Article):
             auteurs = []
             auteur = article.find(class_='auteur')
 
-            if auteur.text == '':
+            if auteur.text != '':
                 sentence = Sentence(auteur.text)
                 self.tagger.predict(sentence)
                 for entity in sentence.get_spans('ner'):
@@ -95,24 +95,23 @@ class ArticleCourt(Article):
             self.date_ecriture.append(date)
 
     # ERREUR !! (revoir la bd pour remplir correctement les professions en fonction des auteurs)
-    def get_lieu_profession(self, page) -> None:
-        articles = page.find_all(class_='container-fluid')[1:]
-
-        for article in articles:
-            lieu = []
-            auteur = article.find(class_='auteur')
-
-            if auteur.text != '':
-                sentence = Sentence(auteur.text)
-                self.tagger.predict(sentence)
-                for entity in sentence.get_spans('ner'):
-                    if entity.tag == 'LOC':
-                        lieu.append(entity.to_plain_string())
-
-            self.lieu_profession.append(lieu)
+    # def get_lieu_profession(self, page) -> None:
+    #     articles = page.find_all(class_='container-fluid')[1:]
+    #
+    #     for article in articles:
+    #         lieu = []
+    #         auteur = article.find(class_='auteur')
+    #
+    #         if auteur.text != '':
+    #             sentence = Sentence(auteur.text)
+    #             self.tagger.predict(sentence)
+    #             for entity in sentence.get_spans('ner'):
+    #                 if entity.tag == 'LOC':
+    #                     lieu.append(entity.to_plain_string())
+    #
+    #         self.lieu_profession.append(lieu)
 
     def get_personnalite(self, titre: str) -> None:
-        print(titre)
         personnalite = []
         sentence = Sentence(titre)
         self.tagger.predict(sentence)
@@ -120,4 +119,4 @@ class ArticleCourt(Article):
             if entity.tag == 'PER':
                 personnalite.append(entity.to_plain_string())
 
-        self.personnalite.append(personnalite)
+        self.personnalites.append(personnalite)
