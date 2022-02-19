@@ -18,8 +18,8 @@ def get_nombre_articles(page) -> int:
     return len(articles)
 
 
-def scrap_article_long():
-    articles = ArticleLong()
+def scrap_article_long(tagger):
+    articles = ArticleLong(tagger)
     pages = get_nombre_pages(articles.url)
 
     for num in range(1, pages + 1):
@@ -43,8 +43,8 @@ def scrap_article_long():
     return articles
 
 
-def scrap_article_court():
-    articles = ArticleCourt()
+def scrap_article_court(tagger):
+    articles = ArticleCourt(tagger)
     num_article = 0
     pages = get_nombre_pages(articles.url)
 
@@ -63,7 +63,7 @@ def scrap_article_court():
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
         articles.get_date_ecriture(page)
-        articles.get_lieu_profession(page)
+        # articles.get_lieu_profession(page)
 
         num_article += get_nombre_articles(page)
 

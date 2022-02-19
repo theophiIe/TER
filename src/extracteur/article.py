@@ -4,7 +4,7 @@ from abc import abstractmethod, ABC
 
 
 class Article(ABC):
-    def __init__(self):
+    def __init__(self, tagger):
         self.url = 'https://lessurligneurs.eu/lire/'
         self.url_article = []
         self.titre_article = []
@@ -15,6 +15,8 @@ class Article(ABC):
         self.liens_citations = []
         self.date_ecriture = []
         self.lieu_profession = []
+
+        self.tagger = tagger
 
     @abstractmethod
     def get_url_articles(self, num_page) -> None:
