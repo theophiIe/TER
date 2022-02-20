@@ -27,13 +27,7 @@ def insert_auteur(session, element, articles):
     for auteur in articles.auteur_article[element]:
         q = session.query(Auteur).filter(Auteur.nom == auteur)
         if not session.query(q.exists()).scalar():
-            # À modifier pour ajouter la profession des auteurs
-            # if articles.lieu_profession[element][0] is None:
-            #     aut = Auteur(auteur, articles.profession_auteur[element][0], None)
-            # else:
-            #     aut = Auteur(auteur, articles.profession_auteur[element][0], articles.lieu_profession[element][0])
-            aut = Auteur(auteur, articles.profession_auteur[element][0], None)
-            insert(session, aut)
+            insert(session, Auteur(auteur, articles.profession_auteur[element][0]))
 
 
 def insert_personnalite(session, element, articles):
@@ -45,9 +39,10 @@ def insert_personnalite(session, element, articles):
 
 
 def insert_article_court(session, element, articles):
-    article = Article(articles.titre_article[element],
-                      "court",
-                      articles.etiquette[element])
+    date_citation = articles.date_citation[element][0] if articles.date_citation[element] is not None else None
+
+    article = Article(articles.titre_article[element], "court", articles.etiquette[element],
+                      articles.source_citation[element], date_citation)
 
     insert(session, article)
 
@@ -55,10 +50,7 @@ def insert_article_court(session, element, articles):
 
 
 def insert_article_long(session, element, articles):
-    article = Article(articles.titre_article[element],
-                      "long",
-                      "None")
-
+    article = Article(articles.titre_article[element], "long", None, None, None)
     insert(session, article)
 
     return article
@@ -66,10 +58,9 @@ def insert_article_long(session, element, articles):
 
 def insert_ecritpar(session, element, article, articles):
     for auteur in articles.auteur_article[element]:
-        if articles.date_ecriture[element][0] is None:
-            ecrit_par = EcritPar(article.article_id, auteur, None)
-        else:
-            ecrit_par = EcritPar(article.article_id, auteur, articles.date_ecriture[element][0])
+        date = articles.date_ecriture[element][0] if articles.date_ecriture[element] is not None else None
+        ecrit_par = EcritPar(article.article_id, auteur, date)
+
         insert(session, ecrit_par)
 
 
