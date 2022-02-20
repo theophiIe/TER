@@ -36,7 +36,6 @@ def scrap_article_long(tagger):
         articles.get_profession_auteurs(page)
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
-        articles.get_date_ecriture(page)
 
         num_article += get_nombre_articles(page)
 
@@ -62,7 +61,6 @@ def scrap_article_court(tagger):
         articles.get_source_date_citation(page)
         articles.get_contenu_articles(page)
         articles.get_liens_citations(page)
-        articles.get_date_ecriture(page)
 
         num_article += get_nombre_articles(page)
 
