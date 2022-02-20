@@ -9,16 +9,22 @@ from src.extracteur.scrapping import scrap_article_court, scrap_article_long
 def main(user, pwd, host, port, db):
     print("Chargement de Flair french")
     tagger = SequenceTagger.load("flair/ner-french")
+
     print("Scrapping information article court :")
     articles_court = scrap_article_court(tagger)
+
     print("Scrapping information article long :")
     articles_long = scrap_article_long(tagger)
+
     print("Connexion à la base de donnée")
     engines = connexion(user, pwd, host, port, db)
+
     print("Insertion élément article court :")
     remplissage(engines, articles_court)
+
     print("Insertion élément article long :")
     remplissage(engines, articles_long)
+
     print("Fin")
 
 

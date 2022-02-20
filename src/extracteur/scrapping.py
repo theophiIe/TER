@@ -27,7 +27,7 @@ def scrap_article_long(tagger):
         articles.get_url_articles(num)
 
     num_article = 0
-    pbar = tqdm(range(len(articles.url_article)))
+    pbar = tqdm(range(len(articles.url_article)), colour='green', desc='Progression')
 
     while num_article < len(articles.url_article):
         page = BeautifulSoup(requests.get(articles.url_article[num_article]).content, 'lxml')
@@ -54,7 +54,7 @@ def scrap_article_court(tagger):
         articles.get_url_articles(num)
 
     num_article = 0
-    pbar = tqdm(range(len(articles.url_article)))
+    pbar = tqdm(range(len(articles.url_article)), colour='green', desc='Progression')
 
     while num_article < len(articles.url_article):
         page = BeautifulSoup(requests.get(articles.url_article[num_article]).content, 'lxml')

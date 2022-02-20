@@ -106,9 +106,8 @@ def insert_contenu(session, element, article, articles):
 
 
 def remplissage(engine, articles):
+    pbar = tqdm(range(len(articles.url_article)), colour='green', desc='Progression')
     with Session(bind=engine) as session:
-        increment = 0
-        pbar = tqdm(range(len(articles.url_article)))
         for element in range(len(articles.url_article)):
             if isinstance(articles, ArticleCourt):
                 article = insert_article_court(session, element, articles)
@@ -122,6 +121,5 @@ def remplissage(engine, articles):
             insert_url_ref(session, element, article, articles)
             insert_contenu(session, element, article, articles)
 
-            increment += 1
-            pbar.update(increment)
+            pbar.update(1)
             pbar.refresh()
