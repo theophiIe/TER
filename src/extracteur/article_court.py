@@ -39,7 +39,8 @@ class ArticleCourt(Article):
 
         for article in articles:
             for etiquette in article.find_all('button'):
-                self.etiquette.append(etiquette.text)
+                val_etiquette = etiquette.text if etiquette.text != '' else None
+                self.etiquette.append(val_etiquette)
 
     def get_auteurs_articles(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
@@ -48,6 +49,14 @@ class ArticleCourt(Article):
             auteurs = []
             lieu_buffer = []
             auteur = article.find(class_='auteur')
+
+            if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                         r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text):
+                self.date_ecriture.append(
+                    re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                               r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
+            else:
+                self.date_ecriture.append(None)
 
             if auteur.text != '':
                 sentence = Sentence(auteur.text)
@@ -80,38 +89,32 @@ class ArticleCourt(Article):
         articles = page.find_all(class_='container-fluid')[1:]
 
         for article in articles:
-            date = []
-            source = []
-            date_source = article.find('h2')
-            date.append(re.findall(r'[0-9]*[0-9] [a-é]+ [0-9]*[0-9]*[0-9]*[0-9]*', date_source.text))
-            source.append(date_source.text.split(',')[0])
+            source_date = article.find('h2')
+            if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                         r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", source_date.text):
+                self.date_citation.append(
+                    re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                               r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", source_date.text))
+            else:
+                self.date_citation.append(None)
+
+            source = source_date.text.split(',')[0] if source_date.text.split(',')[0] != '' else None
             self.source_citation.append(source)
-            self.date_citation.append(date)
-
-    def get_date_ecriture(self, page) -> None:
-        articles = page.find_all(class_='container-fluid')[1:]
-
-        for article in articles:
-            date = []
-            auteur = article.find(class_='auteur')
-            date.append(re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                                   r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
-            self.date_ecriture.append(date)
 
     def get_personnalite(self, titre: str) -> None:
         personnalite = []
-        buffer = titre.replace("TotalEnergies", " ")\
-            .replace("procès", " ")\
-            .replace("au président de la République", "Emmanuel Macron")\
-            .replace("Frexit", " ")\
+        buffer = titre.replace("TotalEnergies", " ") \
+            .replace("procès", " ") \
+            .replace("au président de la République", "Emmanuel Macron") \
+            .replace("Frexit", " ") \
             .replace("StopCovid", " ")
 
         sentence = Sentence(buffer)
         self.tagger.predict(sentence)
         for entity in sentence.get_spans('ner'):
             if entity.tag == 'PER':
-                tmp = entity.to_plain_string()
-                if len(tmp) > 2:
-                    personnalite.append(tmp)
+                nom = entity.to_plain_string()
+                if len(nom) > 2:
+                    personnalite.append(nom)
 
         self.personnalites.append(personnalite)
