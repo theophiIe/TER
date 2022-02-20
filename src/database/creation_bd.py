@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
+from tqdm import tqdm
 
 from src.extracteur.article_court import ArticleCourt
 from src.extracteur.article_long import ArticleLong
@@ -106,6 +107,8 @@ def insert_contenu(session, element, article, articles):
 
 def remplissage(engine, articles):
     with Session(bind=engine) as session:
+        increment = 0
+        pbar = tqdm(range(len(articles.url_article)))
         for element in range(len(articles.url_article)):
             if isinstance(articles, ArticleCourt):
                 article = insert_article_court(session, element, articles)
@@ -118,3 +121,7 @@ def remplissage(engine, articles):
             insert_url_lien(session, element, article, articles)
             insert_url_ref(session, element, article, articles)
             insert_contenu(session, element, article, articles)
+
+            increment += 1
+            pbar.update(increment)
+            pbar.refresh()
