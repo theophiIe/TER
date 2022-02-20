@@ -14,7 +14,6 @@ class Article(ABC):
         self.contenu_articles = []
         self.liens_citations = []
         self.date_ecriture = []
-        self.lieu_profession = []
 
         self.tagger = tagger
 
