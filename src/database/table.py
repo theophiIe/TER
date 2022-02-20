@@ -10,12 +10,10 @@ class Auteur(Base):
 
     nom = Column(String, primary_key=True)
     profession = Column(String)
-    lieu = Column(String)
 
-    def __init__(self, nom, profession, lieu):
+    def __init__(self, nom, profession):
         self.nom = nom
         self.profession = profession
-        self.lieu = lieu
 
     # Relationship avec EcritPar
     parents_ecritpar = relationship("EcritPar", back_populates="child_ecritpar")
@@ -40,12 +38,15 @@ class Article(Base):
     titre = Column(String, nullable=False, unique=True)
     type_article = Column(String(5), nullable=False)
     etiquette = Column(String, nullable=True)
-    lieu = Column(String)
+    source = Column(String)
+    date_citation = Column(String)
 
-    def __init__(self, titre: str, type_article: str, etiquette: str):
+    def __init__(self, titre: str, type_article: str, etiquette, source, date_citation):
         self.titre = titre
         self.type_article = type_article
         self.etiquette = etiquette
+        self.source = source
+        self.date_citation = date_citation
 
     # Relationship avec EcritPar
     children_ecritpar = relationship("EcritPar", back_populates="parent_ecritpar")
