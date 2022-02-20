@@ -29,7 +29,16 @@ class ArticleLong(Article):
 
         for article in articles:
             auteurs = []
+            lieu = []
             auteur = article.find('h2')
+
+            if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                         r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text):
+                self.date_ecriture.append(
+                    re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                               r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
+            else:
+                self.date_ecriture.append(None)
 
             if auteur.text != '':
                 sentence = Sentence(auteur.text)
@@ -37,8 +46,11 @@ class ArticleLong(Article):
                 for entity in sentence.get_spans('ner'):
                     if entity.tag == 'PER':
                         auteurs.append(entity.to_plain_string())
+                    if entity.tag == 'LOC':
+                        lieu.append(entity.to_plain_string())
 
             self.auteur_article.append(auteurs)
+            self.lieu_profession.append(lieu)
 
     def get_profession_auteurs(self, page) -> None:
         articles = page.find_all(class_='container-fluid')[1:]
@@ -53,13 +65,3 @@ class ArticleLong(Article):
                 except Exception:
                     metier.append("Média")
             self.profession_auteur.append(metier)
-
-    def get_date_ecriture(self, page) -> None:
-        articles = page.find_all(class_='container-fluid')[1:]
-
-        for article in articles:
-            date = []
-            date_ecriture = article.find('h2')
-            date.append(re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                                   r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", date_ecriture.text))
-            self.date_ecriture.append(date)
