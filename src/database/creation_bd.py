@@ -25,10 +25,12 @@ def insert(session, valeur):
 
 
 def insert_auteur(session, element, articles):
-    for auteur in articles.auteur_article[element]:
+    while len(articles.profession_auteur[element]) < len(articles.auteur_article[element]):
+        articles.profession_auteur[element].append(None)
+    for auteur, profession in zip(articles.auteur_article[element], articles.profession_auteur[element]):
         q = session.query(Auteur).filter(Auteur.nom == auteur)
         if not session.query(q.exists()).scalar():
-            insert(session, Auteur(auteur, articles.profession_auteur[element][0]))
+            insert(session, Auteur(auteur, profession))
 
 
 def insert_personnalite(session, element, articles):

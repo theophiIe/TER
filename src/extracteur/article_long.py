@@ -54,10 +54,24 @@ class ArticleLong(Article):
         for article in articles:
             metier = []
             auteur = article.find('h2')
-            professions = auteur.text.split("//")
-            for profession in professions:
-                try:
-                    metier.append(profession.split(',')[1])
-                except Exception:
-                    metier.append("Média")
+            texte = auteur.text
+            if str(texte).find("//") != -1:
+                professions = texte.split("//")
+                for profession in professions:
+                    if profession.find(",") != -1:
+                        test = profession.split(",")
+                        if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                                     r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", test[1]):
+                            metier.append(None)
+                        else:
+                            metier.append(test[1])
+            else:
+                if str(texte).find(",") != -1:
+                    professions = texte.split(",")
+                    if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
+                                 r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", professions[1]):
+                        metier.append(None)
+                    else:
+                        metier.append(professions[1])
+
             self.profession_auteur.append(metier)
