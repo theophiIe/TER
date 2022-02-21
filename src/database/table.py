@@ -80,9 +80,11 @@ class UrlTexte(Base):
     __tablename__ = "t_urltexte"
 
     url = Column(String, primary_key=True)
+    titre = Column(String)
 
-    def __init__(self, url):
+    def __init__(self, url, titre):
         self.url = url
+        self.titre = titre
 
     # Relationship avec Reference
     parents_reference = relationship("Reference", back_populates="child_reference")

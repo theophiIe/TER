@@ -83,11 +83,11 @@ def insert_url_lien(session, element, article, articles):
 
 
 def insert_url_ref(session, element, article, articles):
-    for url in articles.liens_citations[element]:
+    for url, nom in zip(articles.liens_citations[element], articles.titre_citations[element]):
         if url is not None:
             q = session.query(UrlTexte).filter(UrlTexte.url == url)
             if not session.query(q.exists()).scalar():
-                url_texte = UrlTexte(url)
+                url_texte = UrlTexte(url, nom)
                 insert(session, url_texte)
 
             # Permet de vérifier que dans un meme article, un url n'apparait qu'une et une seule fois

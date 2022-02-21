@@ -13,6 +13,7 @@ class Article(ABC):
         self.articles_en_lien = []
         self.contenu_articles = []
         self.liens_citations = []
+        self.titre_citations = []
         self.date_ecriture = []
 
         self.tagger = tagger
@@ -58,6 +59,19 @@ class Article(ABC):
 
         for article in articles:
             lien_article = []
+            titre = []
             for lien in article.find(class_='texte').find_all('a'):
                 lien_article.append(lien.get('href'))
+                if lien.find('i') is None:
+                    title = lien.find('span')
+                    if title is not None:
+                        titre.append(title.text)
+                    else:
+                        titre.append(lien.text)
+                else:
+                    balise = lien.find('i').find('span')
+                    if balise is not None:
+                        titre.append(balise.text)
+
             self.liens_citations.append(lien_article)
+            self.titre_citations.append(titre)
