@@ -31,13 +31,14 @@ def scrap_article_long(tagger):
 
     while num_article < len(articles.url_article):
         page = BeautifulSoup(requests.get(articles.url_article[num_article]).content, 'lxml')
+        articles.article_bs4 = page.find_all(class_='container-fluid')[1:]
 
         articles.get_titres_articles(page)
-        articles.get_articles_en_liens(page)
-        articles.get_auteurs_articles(page)
-        articles.get_profession_auteurs(page)
+        articles.get_articles_en_liens()
+        articles.get_auteurs_articles()
+        articles.get_profession_auteurs()
         articles.get_contenu_articles(page)
-        articles.get_liens_citations(page)
+        articles.get_liens_citations()
 
         num_article += get_nombre_articles(page)
         pbar.update(get_nombre_articles(page))
@@ -58,15 +59,16 @@ def scrap_article_court(tagger):
 
     while num_article < len(articles.url_article):
         page = BeautifulSoup(requests.get(articles.url_article[num_article]).content, 'lxml')
+        articles.article_bs4 = page.find_all(class_='container-fluid')[1:]
 
         articles.get_titres_articles(page)
         articles.get_etiquette_articles(page)
-        articles.get_articles_en_liens(page)
-        articles.get_auteurs_articles(page)
-        articles.get_profession_auteurs(page)
-        articles.get_source_date_citation(page)
+        articles.get_articles_en_liens()
+        articles.get_auteurs_articles()
+        articles.get_profession_auteurs()
+        articles.get_source_date_citation()
         articles.get_contenu_articles(page)
-        articles.get_liens_citations(page)
+        articles.get_liens_citations()
 
         num_article += get_nombre_articles(page)
         pbar.update(get_nombre_articles(page))

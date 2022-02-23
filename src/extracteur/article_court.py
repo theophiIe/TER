@@ -42,68 +42,23 @@ class ArticleCourt(Article):
                 val_etiquette = etiquette.text if etiquette.text != '' else None
                 self.etiquette.append(val_etiquette)
 
-    def get_auteurs_articles(self, page) -> None:
-        articles = page.find_all(class_='container-fluid')[1:]
-
-        for article in articles:
-            auteurs = []
+    def get_auteurs_articles(self) -> None:
+        for article in self.article_bs4:
             auteur = article.find(class_='auteur')
+            self.add_date(auteur.text)
+            self.add_auteur(auteur.text)
 
-            if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                         r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text):
-                self.date_ecriture.append(
-                    re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                               r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", auteur.text))
-            else:
-                self.date_ecriture.append(None)
-
-            if auteur.text != '':
-                sentence = Sentence(auteur.text)
-                self.tagger.predict(sentence)
-                for entity in sentence.get_spans('ner'):
-                    if entity.tag == 'PER':
-                        auteurs.append(entity.to_plain_string())
-
-            self.auteur_article.append(auteurs)
-
-    def get_profession_auteurs(self, page) -> None:
-        articles = page.find_all(class_='container-fluid')[1:]
-
-        for article in articles:
-            metier = []
+    def get_profession_auteurs(self) -> None:
+        for article in self.article_bs4:
             auteur = article.find(class_='auteur')
-            texte = auteur.text
-            if str(texte).find("//") != -1:
-                professions = texte.split("//")
-                for profession in professions:
-                    if profession.find(",") != -1:
-                        test = profession.split(",")
-                        if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                                     r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", test[1]):
-                            metier.append(None)
-                        else:
-                            metier.append(test[1])
-            else:
-                if str(texte).find(",") != -1:
-                    professions = texte.split(",")
-                    if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                                 r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", professions[1]):
-                        metier.append(None)
-                    else:
-                        metier.append(professions[1])
+            self.add_profession(auteur.text)
 
-            self.profession_auteur.append(metier)
-
-    def get_source_date_citation(self, page) -> None:
-        articles = page.find_all(class_='container-fluid')[1:]
-
-        for article in articles:
+    def get_source_date_citation(self) -> None:
+        for article in self.article_bs4:
             source_date = article.find('h2')
-            if re.search(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                         r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", source_date.text):
+            if re.search(self.regex_date, source_date.text):
                 self.date_citation.append(
-                    re.findall(r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre"
-                               r"|octobre|novembre|décembre)[ ]*[0-9]{0,4})", source_date.text))
+                    re.findall(self.regex_date, source_date.text))
             else:
                 self.date_citation.append(None)
 
