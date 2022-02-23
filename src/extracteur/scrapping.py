@@ -19,7 +19,7 @@ def get_nombre_articles(page) -> int:
     return len(articles)
 
 
-def scrap_article_long(tagger):
+def scrap_article_long(tagger) -> ArticleLong:
     articles = ArticleLong(tagger)
     pages = get_nombre_pages(articles.url)
 
@@ -47,7 +47,7 @@ def scrap_article_long(tagger):
     return articles
 
 
-def scrap_article_court(tagger):
+def scrap_article_court(tagger) -> ArticleCourt:
     articles = ArticleCourt(tagger)
     pages = get_nombre_pages(articles.url)
 

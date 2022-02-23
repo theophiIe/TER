@@ -78,13 +78,13 @@ class Article(ABC):
             self.liens_citations.append(lien_article)
             self.titre_citations.append(titre)
 
-    def add_date(self, texte):
+    def add_date(self, texte: str) -> None:
         if re.search(self.regex_date, texte):
             self.date_ecriture.append(re.findall(self.regex_date, texte))
         else:
             self.date_ecriture.append(None)
 
-    def add_auteur(self, texte):
+    def add_auteur(self, texte: str) -> None:
         auteurs = []
         if texte != '':
             sentence = Sentence(texte)
@@ -95,7 +95,7 @@ class Article(ABC):
 
         self.auteur_article.append(auteurs)
 
-    def add_profession(self, texte):
+    def add_profession(self, texte: str) -> None:
         metier = []
         if texte.find("//") != -1:
             professions = texte.split("//")

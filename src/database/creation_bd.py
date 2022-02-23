@@ -19,12 +19,12 @@ def connexion(user, pwd, host, port, name):
     return engine
 
 
-def insert(session, valeur):
+def insert(session, valeur) -> None:
     session.add(valeur)
     session.commit()
 
 
-def insert_auteur(session, element, articles):
+def insert_auteur(session, element, articles) -> None:
     while len(articles.profession_auteur[element]) < len(articles.auteur_article[element]):
         articles.profession_auteur[element].append(None)
     for auteur, profession in zip(articles.auteur_article[element], articles.profession_auteur[element]):
@@ -33,7 +33,7 @@ def insert_auteur(session, element, articles):
             insert(session, Auteur(auteur, profession))
 
 
-def insert_personnalite(session, element, articles):
+def insert_personnalite(session, element, articles) -> None:
     for personnalite in articles.personnalites[element]:
         q = session.query(Personnalite).filter(Personnalite.nom == personnalite)
         if not session.query(q.exists()).scalar():
@@ -41,7 +41,7 @@ def insert_personnalite(session, element, articles):
             insert(session, perso)
 
 
-def insert_article_court(session, element, articles):
+def insert_article_court(session, element, articles) -> Article:
     date_citation = articles.date_citation[element][0] if articles.date_citation[element] is not None else None
 
     article = Article(articles.titre_article[element], "court", articles.etiquette[element],
@@ -52,14 +52,14 @@ def insert_article_court(session, element, articles):
     return article
 
 
-def insert_article_long(session, element, articles):
+def insert_article_long(session, element, articles) -> Article:
     article = Article(articles.titre_article[element], "long", None, None, None)
     insert(session, article)
 
     return article
 
 
-def insert_ecritpar(session, element, article, articles):
+def insert_ecritpar(session, element, article, articles) -> None:
     for auteur in articles.auteur_article[element]:
         date = articles.date_ecriture[element][0] if articles.date_ecriture[element] is not None else None
         ecrit_par = EcritPar(article.article_id, auteur, date)
@@ -67,13 +67,13 @@ def insert_ecritpar(session, element, article, articles):
         insert(session, ecrit_par)
 
 
-def insert_parlede(session, element, article, articles):
+def insert_parlede(session, element, article, articles) -> None:
     for personnalite in articles.personnalites[element]:
         parle_de = ParleDe(article.article_id, personnalite)
         insert(session, parle_de)
 
 
-def insert_url_lien(session, element, article, articles):
+def insert_url_lien(session, element, article, articles) -> None:
     for url in articles.articles_en_lien[element]:
         q = session.query(UrlArticleEnLien).filter(UrlArticleEnLien.url == url)
         if not session.query(q.exists()).scalar():
@@ -84,7 +84,7 @@ def insert_url_lien(session, element, article, articles):
         insert(session, enlien)
 
 
-def insert_url_ref(session, element, article, articles):
+def insert_url_ref(session, element, article, articles) -> None:
     for url, nom in zip(articles.liens_citations[element], articles.titre_citations[element]):
         if url is not None:
             q = session.query(UrlTexte).filter(UrlTexte.url == url)
@@ -100,14 +100,14 @@ def insert_url_ref(session, element, article, articles):
                 insert(session, reference)
 
 
-def insert_contenu(session, element, article, articles):
+def insert_contenu(session, element, article, articles) -> None:
     for contenu_article in articles.contenu_articles[element]:
         if contenu_article is not None and contenu_article != " " and contenu_article != "":
             contenus = Contenu(article.article_id, contenu_article)
             insert(session, contenus)
 
 
-def remplissage(engine, articles):
+def remplissage(engine, articles) -> None:
     pbar = tqdm(range(len(articles.url_article)), colour='green', desc='Progression')
     with Session(bind=engine) as session:
         for element in range(len(articles.url_article)):
