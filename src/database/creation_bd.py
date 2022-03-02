@@ -112,8 +112,11 @@ def insert_ecritpar(session, element, article, articles) -> None:
 
 def insert_parlede(session, element, article, articles) -> None:
     for personnalite in articles.personnalites[element]:
-        parle_de = ParleDe(article.article_id, personnalite)
-        insert(session, parle_de)
+        q = session.query(ParleDe) \
+            .filter(ParleDe.personnalite_nom == personnalite).filter(ParleDe.article_id == article.article_id)
+        if not session.query(q.exists()).scalar():
+            parle_de = ParleDe(article.article_id, personnalite)
+            insert(session, parle_de)
 
 
 def insert_url_lien(session, element, article, articles) -> None:
@@ -146,8 +149,11 @@ def insert_url_ref(session, element, article, articles) -> None:
 def insert_contenu(session, element, article, articles) -> None:
     for contenu_article in articles.contenu_articles[element]:
         if contenu_article is not None and contenu_article != " " and contenu_article != "":
-            contenus = Contenu(article.article_id, contenu_article)
-            insert(session, contenus)
+            q = session.query(Contenu) \
+                .filter(Contenu.contenu_article == contenu_article).filter(Contenu.article_id == article.article_id)
+            if not session.query(q.exists()).scalar():
+                contenus = Contenu(article.article_id, contenu_article)
+                insert(session, contenus)
 
 
 def remplissage(engine, articles) -> None:
