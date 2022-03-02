@@ -11,7 +11,7 @@ class Article(ABC):
         self.url = 'https://lessurligneurs.eu/lire/'
         self.article_bs4 = None
         self.regex_date = r"(\d{1,2}[e]?[r]? (?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre" \
-                          r"|novembre|décembre)[ ]*[0-9]{0,4})"
+                          r"|novembre|décembre)[ ]*[0-9]{4})"
         self.url_article = []
         self.titre_article = []
         self.auteur_article = []
