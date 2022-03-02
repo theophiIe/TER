@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey, Integer
+from sqlalchemy import Column, String, ForeignKey, Integer, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -39,7 +39,7 @@ class Article(Base):
     type_article = Column(String(5), nullable=False)
     etiquette = Column(String, nullable=True)
     source = Column(String)
-    date_citation = Column(String)
+    date_citation = Column(Date)
 
     def __init__(self, titre: str, type_article: str, etiquette, source, date_citation):
         self.titre = titre
@@ -99,7 +99,7 @@ class EcritPar(Base):
     # ForeignKey de Auteur
     auteur_nom = Column(ForeignKey('t_auteur.nom'), primary_key=True)
 
-    date_ecriture = Column(String)
+    date_ecriture = Column(Date)
 
     # Relationship de Article
     child_ecritpar = relationship("Auteur", back_populates="parents_ecritpar")

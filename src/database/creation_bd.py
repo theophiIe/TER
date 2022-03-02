@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
@@ -24,6 +26,42 @@ def insert(session, valeur) -> None:
     session.commit()
 
 
+def setup_date(string: str):
+    dictmois = {
+        "janvier": "-01-",
+        "février": "-02-",
+        "mars": "-03-",
+        "avril": "-04-",
+        "mai": "-05-",
+        "juin": "-06-",
+        "juillet": "-07-",
+        "août": "-08-",
+        "septembre": "-09-",
+        "octobre": "-10-",
+        "novembre": "-11-",
+        "décembre": "-12-"
+    }
+
+    data = string.replace("1er", "1").split(" ")
+
+    if len(data) == 3:
+        data.reverse()
+        for k, v in dictmois.items():
+            data[1] = str(data[1]).replace(k, v)
+
+        date = ""
+        for valeur in data:
+            date += str(valeur)
+
+        date += ", 00:00:00"
+        date = datetime.datetime.strptime(date, '%Y-%m-%d, %H:%M:%S').date()
+    else:
+        datenow = datetime.datetime.today().strftime('%Y-%m-%d, %H:%M:%S')
+        date = datetime.datetime.strptime(datenow, '%Y-%m-%d, %H:%M:%S').date()
+
+    return date
+
+
 def insert_auteur(session, element, articles) -> None:
     while len(articles.profession_auteur[element]) < len(articles.auteur_article[element]):
         articles.profession_auteur[element].append(None)
@@ -42,7 +80,8 @@ def insert_personnalite(session, element, articles) -> None:
 
 
 def insert_article_court(session, element, articles) -> Article:
-    date_citation = articles.date_citation[element][0] if articles.date_citation[element] is not None else None
+    date_citation = setup_date(articles.date_citation[element][0]) \
+        if articles.date_citation[element] is not None else None
 
     article = Article(articles.titre_article[element], "court", articles.etiquette[element],
                       articles.source_citation[element], date_citation)
@@ -64,7 +103,8 @@ def insert_ecritpar(session, element, article, articles) -> None:
         q = session.query(EcritPar) \
             .filter(EcritPar.auteur_nom == auteur).filter(EcritPar.article_id == article.article_id)
         if not session.query(q.exists()).scalar():
-            date = articles.date_ecriture[element][0] if articles.date_ecriture[element] is not None else None
+            date = setup_date(articles.date_ecriture[element][0]) \
+                if articles.date_ecriture[element] is not None else None
             ecrit_par = EcritPar(article.article_id, auteur, date)
 
             insert(session, ecrit_par)
