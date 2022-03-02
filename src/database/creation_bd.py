@@ -61,10 +61,13 @@ def insert_article_long(session, element, articles) -> Article:
 
 def insert_ecritpar(session, element, article, articles) -> None:
     for auteur in articles.auteur_article[element]:
-        date = articles.date_ecriture[element][0] if articles.date_ecriture[element] is not None else None
-        ecrit_par = EcritPar(article.article_id, auteur, date)
+        q = session.query(EcritPar) \
+            .filter(EcritPar.auteur_nom == auteur).filter(EcritPar.article_id == article.article_id)
+        if not session.query(q.exists()).scalar():
+            date = articles.date_ecriture[element][0] if articles.date_ecriture[element] is not None else None
+            ecrit_par = EcritPar(article.article_id, auteur, date)
 
-        insert(session, ecrit_par)
+            insert(session, ecrit_par)
 
 
 def insert_parlede(session, element, article, articles) -> None:
