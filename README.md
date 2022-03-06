@@ -1,10 +1,10 @@
 # TER
 
-[![Generic badge](https://img.shields.io/badge/python-3.8.10-green.svg)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/flair-0.10-green.svg)](https://github.com/flairNLP/flair) [![Generic badge](https://img.shields.io/badge/beautifulsoup4-4.9.1-green.svg)](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) [![Generic badge](https://img.shields.io/badge/web-lessurligneurs-green.svg)](https://lessurligneurs.eu/)
+[![Generic badge](https://img.shields.io/badge/python-3.8.10-9cf.svg)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/flair-0.10-9cf.svg)](https://github.com/flairNLP/flair) [![Generic badge](https://img.shields.io/badge/beautifulsoup4-4.9.1-9cf.svg)](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) [![Generic badge](https://img.shields.io/badge/web-lessurligneurs-9cf.svg)](https://lessurligneurs.eu/)
 
 --------
 
-## Sujet
+## Sujet :book:
 Intégration de sources de données textuelles
 
 Les documents textuels sont disponibles en très grands nombres sur le web.
@@ -20,10 +20,21 @@ Les tâches à réaliser sont donc :
 
 -------
 
-## Compilation
+## Pré-requis
+
+Pour faire fonctionner l'application un serveur local `PostgreSQL` est nécessaire.
+
+Pour installer les dépendances requises au projet, exécuter la commande suivante :
+```bash
+pip3 install requirements.txt
+```
+
+-------
+
+## Exécution
 
 ```sh
-python3 main.py
+python3 main.py --user [name] --pwd [password] --host [host] --port [num_port] --db [nom_bd]
 ```
 
 -------
