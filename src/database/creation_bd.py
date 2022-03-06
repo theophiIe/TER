@@ -12,6 +12,15 @@ from src.database.table import Base, Auteur, Article, EcritPar, UrlArticleEnLien
 
 
 def connexion(user, pwd, host, port, name):
+    """
+    Permet la connection à une base de données PostgresQL.
+
+    :param user : nom de l'utilisateur de la base de donnée.
+    :param pwd : mot de passe pour se connecter à la base de donnée.
+    :param host : hôte de la base de données.
+    :param port : port de connexion de la base de donnée.
+    :param name : nom de la base de données.
+    """
     engine = create_engine(f"postgresql://{user}:{pwd}@{host}:{port}/{name}")
     if not database_exists(engine.url):
         create_database(engine.url)
@@ -27,6 +36,12 @@ def insert(session, valeur) -> None:
 
 
 def setup_date(string: str):
+    """
+    Prend un date et la retructure en format reconnu par PostgreSQL.
+
+    :param string:
+    :return la date restructuré sous format PostgreSQL.
+    """
     dictmois = {
         "janvier": "-01-",
         "février": "-02-",
@@ -63,6 +78,13 @@ def setup_date(string: str):
 
 
 def insert_auteur(session, element, articles) -> None:
+    """
+    Permet l'insertion des auteurs dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données.
+    :param element: numéro d'article courant.
+    :param articles: instance de la classe Article.
+    """
     while len(articles.profession_auteur[element]) < len(articles.auteur_article[element]):
         articles.profession_auteur[element].append(None)
     for auteur, profession in zip(articles.auteur_article[element], articles.profession_auteur[element]):
@@ -72,6 +94,13 @@ def insert_auteur(session, element, articles) -> None:
 
 
 def insert_personnalite(session, element, articles) -> None:
+    """
+    Permet l'insertion des personnalités (personne sur lequel porte l'article) dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param articles: instance de la classe Article.
+    """
     for personnalite in articles.personnalites[element]:
         q = session.query(Personnalite).filter(Personnalite.nom == personnalite)
         if not session.query(q.exists()).scalar():
@@ -80,6 +109,13 @@ def insert_personnalite(session, element, articles) -> None:
 
 
 def insert_article_court(session, element, articles) -> Article:
+    """
+    Permet l'insertion des articles de type court dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param articles: instance de la classe Article.
+    """
     date_citation = setup_date(articles.date_citation[element][0]) \
         if articles.date_citation[element] is not None else None
 
@@ -92,6 +128,13 @@ def insert_article_court(session, element, articles) -> Article:
 
 
 def insert_article_long(session, element, articles) -> Article:
+    """
+    Permet l'insertion des articles de type long dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param articles: instance de la classe Article.
+    """
     article = Article(articles.titre_article[element], "long", None, None, None)
     insert(session, article)
 
@@ -99,6 +142,14 @@ def insert_article_long(session, element, articles) -> Article:
 
 
 def insert_ecritpar(session, element, article, articles) -> None:
+    """
+    Permet l'insertion des articles des relations entre les articles et les auteurs dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param article: instance de la classe Article représente la table des articles dans la base de données.
+    :param articles: instance de la classe ArticleCourt ou ArticleLong.
+    """
     for auteur in articles.auteur_article[element]:
         q = session.query(EcritPar) \
             .filter(EcritPar.auteur_nom == auteur).filter(EcritPar.article_id == article.article_id)
@@ -111,6 +162,14 @@ def insert_ecritpar(session, element, article, articles) -> None:
 
 
 def insert_parlede(session, element, article, articles) -> None:
+    """
+    Permet l'insertion des relations entre les articles et les personnalités dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param article: instance de la classe Article représente la table des articles dans la base de données.
+    :param articles: instance de la classe ArticleCourt.
+    """
     for personnalite in articles.personnalites[element]:
         q = session.query(ParleDe) \
             .filter(ParleDe.personnalite_nom == personnalite).filter(ParleDe.article_id == article.article_id)
@@ -120,17 +179,37 @@ def insert_parlede(session, element, article, articles) -> None:
 
 
 def insert_url_lien(session, element, article, articles) -> None:
+    """
+    Permet l'insertion des relations entre les articles et les liens connexes dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param article: instance de la classe Article représente la table des articles dans la base de données.
+    :param articles: instance de la classe ArticleCourt ou ArticleLong.
+    """
     for url in articles.articles_en_lien[element]:
         q = session.query(UrlArticleEnLien).filter(UrlArticleEnLien.url == url)
         if not session.query(q.exists()).scalar():
             url_enlien = UrlArticleEnLien(url)
             insert(session, url_enlien)
 
-        enlien = EnLien(article.article_id, url)
-        insert(session, enlien)
+        # Permet de vérifier que dans un meme article, une url n'apparait qu'une et une seule fois
+        q = session.query(EnLien) \
+            .filter(EnLien.article_en_lien_url == url).filter(EnLien.article_id == article.article_id)
+        if not session.query(q.exists()).scalar():
+            enlien = EnLien(article.article_id, url)
+            insert(session, enlien)
 
 
 def insert_url_ref(session, element, article, articles) -> None:
+    """
+    Permet l'insertion des relations entre les articles et les liens présents dans le texte dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param article: instance de la classe Article représente la table des articles dans la base de données.
+    :param articles: instance de la classe ArticleCourt ou ArticleLong.
+    """
     for url, nom in zip(articles.liens_citations[element], articles.titre_citations[element]):
         if url is not None:
             q = session.query(UrlTexte).filter(UrlTexte.url == url)
@@ -138,7 +217,7 @@ def insert_url_ref(session, element, article, articles) -> None:
                 url_texte = UrlTexte(url, nom)
                 insert(session, url_texte)
 
-            # Permet de vérifier que dans un meme article, un url n'apparait qu'une et une seule fois
+            # Permet de vérifier que dans un meme article, une url n'apparait qu'une et une seule fois
             q = session.query(Reference)\
                 .filter(Reference.article_texte_url == url).filter(Reference.article_id == article.article_id)
             if not session.query(q.exists()).scalar():
@@ -147,6 +226,14 @@ def insert_url_ref(session, element, article, articles) -> None:
 
 
 def insert_contenu(session, element, article, articles) -> None:
+    """
+    Permet l'insertion du contenu de l'article dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données.
+    :param element: numéro d'article courant.
+    :param article: instance de la classe Article représente la table des articles dans la base de données.
+    :param articles: instance de la classe ArticleCourt ou ArticleLong.
+    """
     for contenu_article in articles.contenu_articles[element]:
         if contenu_article is not None and contenu_article != " " and contenu_article != "":
             q = session.query(Contenu) \
@@ -157,6 +244,12 @@ def insert_contenu(session, element, article, articles) -> None:
 
 
 def remplissage(engine, articles) -> None:
+    """
+    Permet de remplir la base de données.
+
+    :param engine : MockConnection de la base de données.
+    :param articles : articles à insérer dans la base de données.
+    """
     pbar = tqdm(range(len(articles.url_article)), colour='green', desc='Progression')
     with Session(bind=engine) as session:
         for element in range(len(articles.url_article)):
