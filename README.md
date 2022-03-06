@@ -1,10 +1,10 @@
-# TER
+# TER : Les surligneurs
 
 [![Generic badge](https://img.shields.io/badge/python-3.8.10-9cf.svg)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/flair-0.10-9cf.svg)](https://github.com/flairNLP/flair) [![Generic badge](https://img.shields.io/badge/beautifulsoup4-4.9.1-9cf.svg)](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) [![Generic badge](https://img.shields.io/badge/web-lessurligneurs-9cf.svg)](https://lessurligneurs.eu/)
 
 --------
 
-## Sujet :book:
+## Sujet 📖
 Intégration de sources de données textuelles
 
 Les documents textuels sont disponibles en très grands nombres sur le web.
@@ -20,7 +20,8 @@ Les tâches à réaliser sont donc :
 
 -------
 
-## Pré-requis
+## Pré-requis 📂
+La version de Python recommandé est la `3.8.10`.
 
 Pour faire fonctionner l'application un serveur local `PostgreSQL` est nécessaire.
 
@@ -31,7 +32,7 @@ pip3 install requirements.txt
 
 -------
 
-## Exécution
+## Exécution ⚙️
 
 ```sh
 python3 main.py --user [name] --pwd [password] --host [host] --port [num_port] --db [nom_bd]
@@ -39,7 +40,7 @@ python3 main.py --user [name] --pwd [password] --host [host] --port [num_port] -
 
 -------
 
-## Contributeurs
+## Contributeurs 👥
 
 **Théophile Molinatti** _alias_ [theophiIe](https://github.com/theophiIe)
 
