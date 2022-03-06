@@ -27,7 +27,7 @@ Pour faire fonctionner l'application un serveur local `PostgreSQL` est nécessai
 
 Pour installer les dépendances requises au projet, exécuter la commande suivante :
 ```bash
-pip3 install requirements.txt
+pip3 install -r requirements.txt
 ```
 
 -------
