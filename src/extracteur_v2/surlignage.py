@@ -1,8 +1,13 @@
 import re
+import unicodedata
 from pprint import pprint
 
 import requests
 from bs4 import BeautifulSoup
+
+
+def normalize_text(texte: str) -> str:
+    return unicodedata.normalize("NFKD", texte)
 
 
 def get_nombre_pages(url) -> int:
@@ -53,7 +58,7 @@ class Surlignage:
         if titre is not None:
             contenu_titre = titre.text if titre.text != '' else None
 
-        self.titre.append(contenu_titre)
+        self.titre.append(normalize_text(contenu_titre))
 
     def get_etiquette_surlignage(self, page) -> None:
         etiquette = page.find(class_='etiquette')
@@ -61,7 +66,7 @@ class Surlignage:
 
         if etiquette is not None:
             contenu_etiquette = etiquette.text if etiquette.text != '' else None
-        self.etiquette.append(contenu_etiquette)
+        self.etiquette.append(normalize_text(contenu_etiquette))
 
     def get_meme_theme_surlignage(self, page) -> None:
         url_meme_theme = []
@@ -102,11 +107,11 @@ class Surlignage:
 
                 for contributeur in contributeurs:
                     if contributeur.text.startswith('Auteur'):
-                        auteurs.append(contributeur.text)
+                        auteurs.append(normalize_text(contributeur.text))
                     elif contributeur.text.startswith('Relecteurs'):
-                        relecteurs.append(contributeur.text)
+                        relecteurs.append(normalize_text(contributeur.text))
                     elif contributeur.text.startswith('Secrétariat'):
-                        secretariat.append(contributeur.text)
+                        secretariat.append(normalize_text(contributeur.text))
 
                 self.auteurs.append(auteurs)
                 self.relecteurs.append(relecteurs)
@@ -128,7 +133,7 @@ class Surlignage:
         auteur = None
 
         if auteurs is not None:
-            auteur = auteurs.text
+            auteur = normalize_text(auteurs.text)
 
         self.auteurs.append(auteur)
 
@@ -146,7 +151,7 @@ class Surlignage:
                     liens = lien.text.split(",")
                     for texte in liens:
                         if not re.search(self.regex_date, texte):
-                            nom_source.append(texte)
+                            nom_source.append(normalize_text(texte))
 
         self.nom_source.append(nom_source)
         self.url_source.append(resultat)
@@ -156,7 +161,7 @@ class Surlignage:
         resultat = None
 
         if correction is not None:
-            resultat = correction.text
+            resultat = normalize_text(correction.text)
         self.correction.append(resultat)
 
     def get_contenu_surlignage(self, page) -> None:
@@ -166,7 +171,7 @@ class Surlignage:
         if texte is not None:
             paragraphe = texte.find_all('p')
             for bloc in paragraphe[:-1]:
-                contenu_article.append(bloc.text)
+                contenu_article.append(normalize_text(bloc.text))
 
         self.contenu.append(contenu_article)
 
@@ -180,7 +185,7 @@ class Surlignage:
             for bloc in paragraphe[:-1]:
                 for lien in bloc.find_all('a'):
                     liens_references.append(lien.get('href'))
-                    nom_references.append(lien.text)
+                    nom_references.append(normalize_text(lien.text))
 
         self.url_references.append(liens_references)
         self.nom_references.append(nom_references)
