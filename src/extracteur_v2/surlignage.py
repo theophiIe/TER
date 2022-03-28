@@ -33,7 +33,8 @@ class Surlignage:
         self.redaction = []
         self.url_source = []
         self.nom_source = []
-        self.references = []
+        self.url_references = []
+        self.nom_references = []
         self.correction = []
         self.contenu = []
         self.meme_theme = []
@@ -170,16 +171,19 @@ class Surlignage:
         self.contenu.append(contenu_article)
 
     def get_reference_surlignage(self, page) -> None:
-        liens_references = []
         texte = page.find(class_='texte')
+        liens_references = []
+        nom_references = []
 
         if texte is not None:
             paragraphe = texte.find_all('p')
             for bloc in paragraphe[:-1]:
                 for lien in bloc.find_all('a'):
                     liens_references.append(lien.get('href'))
+                    nom_references.append(lien.text)
 
-        self.references.append(liens_references)
+        self.url_references.append(liens_references)
+        self.nom_references.append(nom_references)
 
 
 if __name__ == '__main__':
@@ -217,7 +221,8 @@ if __name__ == '__main__':
     pprint(surlignage.redaction)
     pprint(surlignage.url_source)
     pprint(surlignage.nom_source)
-    pprint(surlignage.references)
+    pprint(surlignage.url_references)
+    pprint(surlignage.nom_references)
     pprint(surlignage.contenu)
 
     # pprint(surlignage.url_surlignage)
