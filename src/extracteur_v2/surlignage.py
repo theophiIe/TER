@@ -10,19 +10,6 @@ def normalize_text(texte: str) -> str:
     return unicodedata.normalize("NFKD", texte)
 
 
-def get_nombre_pages(url) -> int:
-    page = requests.get(f"{url}page/2/")
-    soup = BeautifulSoup(page.content, 'lxml')
-    titres = soup.find('title')
-
-    return int(str(titres).split(' ')[5])
-
-
-def get_nombre_articles(page) -> int:
-    articles = page.find_all(class_='grid-item')
-    return len(articles)
-
-
 class Surlignage:
     def __init__(self):
         self.url = 'https://lessurligneurs.eu/surlignage/'
