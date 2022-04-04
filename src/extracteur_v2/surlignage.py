@@ -31,15 +31,15 @@ class Surlignage:
         self.contenu = []
         self.meme_theme = []
 
-    def get_url(self, page) -> None:
-        articles = page.find_all(class_='grid-item')
+    def get_url(self, page, dico_balise) -> None:
+        articles = page.find_all(class_=dico_balise['class']['container_article'])
 
         for article in articles:
-            for lien in article.find_all('a'):
-                self.url_surlignage.append(lien.get('href'))
+            for lien in article.find_all(dico_balise['balise']['lien']):
+                self.url_surlignage.append(lien.get(dico_balise['balise']['url']))
 
-    def get_titre_surlignage(self, page) -> None:
-        titre = page.find('h1')
+    def get_titre_surlignage(self, page, dico_balise) -> None:
+        titre = page.find(dico_balise['balise']['titre'])
         contenu_titre = []
 
         if titre is not None:
@@ -48,26 +48,26 @@ class Surlignage:
 
         self.titre.append(contenu_titre)
 
-    def get_etiquette_surlignage(self, page) -> None:
-        etiquette = page.find(class_='etiquette')
+    def get_etiquette_surlignage(self, page, dico_balise) -> None:
+        etiquette = page.find(class_=dico_balise['class']['etiquette'])
         contenu_etiquette = None
 
         if etiquette is not None:
             contenu_etiquette = etiquette.text if etiquette.text != '' else None
         self.etiquette.append(normalize_text(contenu_etiquette))
 
-    def get_meme_theme_surlignage(self, page) -> None:
+    def get_meme_theme_surlignage(self, page, dico_balise) -> None:
         url_meme_theme = []
-        meme_theme = page.find_all(class_='grid-item')
+        meme_theme = page.find_all(class_=dico_balise['class']['container_article'])
 
         for article in meme_theme:
-            for lien in article.find_all('a'):
-                url_meme_theme.append(lien.get('href'))
+            for lien in article.find_all(dico_balise['balise']['lien']):
+                url_meme_theme.append(lien.get(dico_balise['balise']['url']))
 
         self.meme_theme.append(url_meme_theme)
 
-    def get_date_surlignage(self, page) -> None:
-        dates = page.find(class_='articles-dates')
+    def get_date_surlignage(self, page, dico_balise) -> None:
+        dates = page.find(class_=dico_balise['class']['date'])
         date_creation = None
         date_modification = None
 
@@ -81,11 +81,11 @@ class Surlignage:
         self.date_modification.append(date_modification)
 
     # Pour la V2
-    def __get_contributeur(self, page) -> bool:
-        articles_contributeurs = page.find(class_='articles-contributeurs')
+    def __get_contributeur(self, page, dico_balise) -> bool:
+        articles_contributeurs = page.find(class_=dico_balise['class']['contributeur'])
 
         if articles_contributeurs is not None:
-            contributeurs = articles_contributeurs.find_all('p')
+            contributeurs = articles_contributeurs.find_all(dico_balise['balise']['paragraphe'])
 
             if contributeurs:
 
@@ -131,8 +131,8 @@ class Surlignage:
             return False
 
     # Pour la V1
-    def __get_auteurs(self, page) -> None:
-        auteurs = page.find(class_='auteur')
+    def __get_auteurs(self, page, dico_balise) -> None:
+        auteurs = page.find(class_=dico_balise['class']['auteurs'])
         auteur = []
 
         if auteurs is not None:
@@ -140,21 +140,21 @@ class Surlignage:
 
         self.auteurs.append(auteur)
 
-    def get_auteurs_surlignage(self, page) -> None:
-        if not self.__get_contributeur(page):
-            self.__get_auteurs(page)
+    def get_auteurs_surlignage(self, page, dico_balise) -> None:
+        if not self.__get_contributeur(page, dico_balise):
+            self.__get_auteurs(page, dico_balise)
 
-    def get_source_surlignage(self, page) -> None:
-        paragraphe = page.find(class_='col-md-8')
+    def get_source_surlignage(self, page, dico_balise) -> None:
+        paragraphe = page.find(class_=dico_balise['class']['sources'])
         resultat = None
         nom_source = []
 
         if paragraphe is not None:
-            source = paragraphe.find('h2')
+            source = paragraphe.find(dico_balise['balise']['sous_titre'])
             if source is not None:
-                lien = source.find('a')
+                lien = source.find(dico_balise['balise']['lien'])
                 if lien is not None:
-                    resultat = lien.get('href')
+                    resultat = lien.get(dico_balise['balise']['url'])
                     liens = lien.text.split(",")
                     for texte in liens:
                         if not re.search(self.regex_date, texte):
@@ -169,35 +169,35 @@ class Surlignage:
         self.nom_source.append(nom_source)
         self.url_source.append(resultat)
 
-    def get_correction_surlignage(self, page) -> None:
-        correction = page.find(class_='correction')
+    def get_correction_surlignage(self, page, dico_balise) -> None:
+        correction = page.find(class_=dico_balise['class']['correction'])
         resultat = None
 
         if correction is not None:
             resultat = normalize_text(correction.text)
         self.correction.append(resultat)
 
-    def get_contenu_surlignage(self, page) -> None:
+    def get_contenu_surlignage(self, page, dico_balise) -> None:
         contenu_article = []
-        texte = page.find(class_='texte')
+        texte = page.find(class_=dico_balise['class']['contenue'])
 
         if texte is not None:
-            paragraphe = texte.find_all('p')
+            paragraphe = texte.find_all(dico_balise['balise']['paragraphe'])
             for bloc in paragraphe[:-1]:
                 contenu_article.append(normalize_text(bloc.text))
 
         self.contenu.append(contenu_article)
 
-    def get_reference_surlignage(self, page) -> None:
-        texte = page.find(class_='texte')
+    def get_reference_surlignage(self, page, dico_balise) -> None:
+        texte = page.find(class_=dico_balise['class']['contenue'])
         liens_references = []
         nom_references = []
 
         if texte is not None:
-            paragraphe = texte.find_all('p')
+            paragraphe = texte.find_all(dico_balise['balise']['paragraphe'])
             for bloc in paragraphe[:-1]:
-                for lien in bloc.find_all('a'):
-                    liens_references.append(lien.get('href'))
+                for lien in bloc.find_all(dico_balise['balise']['lien']):
+                    liens_references.append(lien.get(dico_balise['balise']['url']))
                     nom_references.append(normalize_text(lien.text))
 
         self.url_references.append(liens_references)
