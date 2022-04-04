@@ -59,3 +59,4 @@ wcwidth==0.2.5
 Wikipedia-API==0.5.4
 wrapt==1.13.3
 zipp==3.7.0
+Unidecode~=1.3.4
