@@ -1,9 +1,5 @@
 import re
 import unicodedata
-from pprint import pprint
-
-import requests
-from bs4 import BeautifulSoup
 
 
 def normalize_text(texte: str) -> str:
