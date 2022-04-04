@@ -1,0 +1,22 @@
+{
+  "balise": {
+    "titre" : "h1",
+    "lien" : "a",
+    "url" : "href",
+    "paragraphe" : "p",
+    "sous_titre" : "h2"
+  },
+
+  "class": {
+    "container_article" : "grid-item",
+    "etiquette" : "etiquette",
+    "date" : "articles-dates",
+    "contributeur" : "articles-contributeurs",
+    "auteurs" : "auteur",
+    "sources" : "col-md-8",
+    "correction" : "correction",
+    "contenue" : "texte"
+  }
+
+
+}
