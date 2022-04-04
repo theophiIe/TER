@@ -40,12 +40,13 @@ class Surlignage:
 
     def get_titre_surlignage(self, page) -> None:
         titre = page.find('h1')
-        contenu_titre = None
+        contenu_titre = []
 
         if titre is not None:
-            contenu_titre = titre.text if titre.text != '' else None
+            res = titre.text if titre.text != '' else None
+            contenu_titre.append(normalize_text(res))
 
-        self.titre.append(normalize_text(contenu_titre))
+        self.titre.append(contenu_titre)
 
     def get_etiquette_surlignage(self, page) -> None:
         etiquette = page.find(class_='etiquette')
@@ -80,7 +81,7 @@ class Surlignage:
         self.date_modification.append(date_modification)
 
     # Pour la V2
-    def get_contributeur_surlignage(self, page) -> bool:
+    def __get_contributeur(self, page) -> bool:
         articles_contributeurs = page.find(class_='articles-contributeurs')
 
         if articles_contributeurs is not None:
@@ -95,14 +96,29 @@ class Surlignage:
                 for contributeur in contributeurs:
                     if contributeur.text.startswith('Auteur'):
                         auteurs.append(normalize_text(contributeur.text))
+                    elif contributeur.text.startswith('Auteurs'):
+                        auteurs.append(normalize_text(contributeur.text))
+                    elif contributeur.text.startswith('Autrice'):
+                        auteurs.append(normalize_text(contributeur.text))
+                    elif contributeur.text.startswith('Autrices'):
+                        auteurs.append(normalize_text(contributeur.text))
+
                     elif contributeur.text.startswith('Relecteurs'):
                         relecteurs.append(normalize_text(contributeur.text))
+                    elif contributeur.text.startswith('Relecteur'):
+                        relecteurs.append(normalize_text(contributeur.text))
+                    elif contributeur.text.startswith('Relectrice'):
+                        relecteurs.append(normalize_text(contributeur.text))
+                    elif contributeur.text.startswith('Relectrices'):
+                        relecteurs.append(normalize_text(contributeur.text))
+
                     elif contributeur.text.startswith('Secrétariat'):
                         secretariat.append(normalize_text(contributeur.text))
 
                 self.auteurs.append(auteurs)
                 self.relecteurs.append(relecteurs)
                 self.redaction.append(secretariat)
+
                 return True
 
             else:
@@ -115,14 +131,18 @@ class Surlignage:
             return False
 
     # Pour la V1
-    def get_auteurs_surlignage(self, page) -> None:
+    def __get_auteurs(self, page) -> None:
         auteurs = page.find(class_='auteur')
-        auteur = None
+        auteur = []
 
         if auteurs is not None:
-            auteur = normalize_text(auteurs.text)
+            auteur.append(normalize_text(auteurs.text))
 
         self.auteurs.append(auteur)
+
+    def get_auteurs_surlignage(self, page) -> None:
+        if not self.__get_contributeur(page):
+            self.__get_auteurs(page)
 
     def get_source_surlignage(self, page) -> None:
         paragraphe = page.find(class_='col-md-8')
@@ -136,6 +156,12 @@ class Surlignage:
                 if lien is not None:
                     resultat = lien.get('href')
                     liens = lien.text.split(",")
+                    for texte in liens:
+                        if not re.search(self.regex_date, texte):
+                            nom_source.append(normalize_text(texte))
+
+                else:
+                    liens = source.text.split(",")
                     for texte in liens:
                         if not re.search(self.regex_date, texte):
                             nom_source.append(normalize_text(texte))
@@ -176,45 +202,3 @@ class Surlignage:
 
         self.url_references.append(liens_references)
         self.nom_references.append(nom_references)
-
-
-if __name__ == '__main__':
-    url_test = "https://www.lessurligneurs.eu/fabien-roussel-sur-les-ecoles-hors-contrat-on-ne-sait-pas-ce-quon-y-enseigne-je-les-ferai-fermer/"
-    url_test2 = "https://www.lessurligneurs.eu/surlignage/page/1/"
-
-    page_test = requests.get(url_test)
-    soup_test = BeautifulSoup(page_test.content, 'lxml')
-
-    page_test2 = requests.get(url_test2)
-    soup_test2 = BeautifulSoup(page_test2.content, 'lxml')
-
-    surlignage = Surlignage()
-    surlignage.get_url(soup_test2)
-    surlignage.get_etiquette_surlignage(soup_test)
-    surlignage.get_titre_surlignage(soup_test)
-    surlignage.get_meme_theme_surlignage(soup_test)
-    surlignage.get_date_surlignage(soup_test)
-
-    if not surlignage.get_contributeur_surlignage(soup_test):
-        surlignage.get_auteurs_surlignage(soup_test)
-
-    surlignage.get_source_surlignage(soup_test)
-    surlignage.get_correction_surlignage(soup_test)
-    surlignage.get_contenu_surlignage(soup_test)
-    surlignage.get_reference_surlignage(soup_test)
-
-    pprint(surlignage.etiquette)
-    pprint(surlignage.titre)
-    pprint(surlignage.meme_theme)
-    pprint(surlignage.date_creation)
-    pprint(surlignage.date_modification)
-    pprint(surlignage.auteurs)
-    pprint(surlignage.relecteurs)
-    pprint(surlignage.redaction)
-    pprint(surlignage.url_source)
-    pprint(surlignage.nom_source)
-    pprint(surlignage.url_references)
-    pprint(surlignage.nom_references)
-    pprint(surlignage.contenu)
-
-    # pprint(surlignage.url_surlignage)
