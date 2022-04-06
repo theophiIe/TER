@@ -145,6 +145,8 @@ class EcritPar(Base):
     # Foreign Key de Auteur
     nom = Column(ForeignKey('t_auteur.nom'), primary_key=True)
 
+    Roles = Column(String, primary_key=True)
+
     # Relationship avec Article
     parent_ecritpar = relationship('Article', back_populates="child_ecritpar")
 
