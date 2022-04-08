@@ -103,7 +103,56 @@ def insert_personnalite(session, element, articles) -> None:
     """
     tagger = SequenceTagger.load("flair/ner-french")
     personnalite = recuperation_nom(articles.titre, tagger)
-    for perso in personnalite:
+    for perso in personnalite[element]:
         q = session.query(Personnalite).filter(Personnalite.nom == personnalite)
         if not session.query(q.exists()).scalar():
             insert(session, Personnalite(perso))
+
+
+def insert_source(session, element, articles) -> None:
+    """
+    Permet l'insertion des sources dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param articles: instance de la classe Article.
+    """
+
+    for url, nom in zip(articles.url_source[element], articles.nom_source[element]):
+        q = session.query(Source).filter(Source.url == url)
+        if not session.query(q.exists()).scalar():
+            insert(session, Source(url, nom))
+
+
+def insert_contenu(session, element, article, articles) -> None:
+    """
+    Permet l'insertion du contenu de l'article dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données.
+    :param element: numéro d'article courant.
+    :param article: instance de la classe Article représente la table des articles dans la base de données.
+    :param articles: instance de la classe ArticleCourt ou ArticleLong.
+    """
+
+    for contenu_article in articles.contenu[element]:
+        if contenu_article is not None and contenu_article not in ["", " "]:
+            q = session.query(Contenu).filter(Contenu.texte == contenu_article)
+            if not session.query(q.exists()).scalar():
+                insert(session, Contenu(contenu_article))
+
+
+def insert_article(session, element, articles) -> None:
+    """
+    Permet l'insertion des articles de type court dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param articles: instance de la classe Article.
+    """
+
+    date_creation = setup_date(articles.date_creation[element])
+    date_modificication = setup_date(articles.date_modification[element])
+
+    article = Article(articles.url_surlignage[element], articles.titre[element], date_creation, date_modificication, \
+                      articles.etiquette[element], articles.correction[element], articles.url_source[element])
+
