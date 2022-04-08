@@ -91,11 +91,9 @@ class Source(Base):
 class Contenu(Base):
     __tablename__ = "t_contenu"
 
-    ID = Column(Integer, primary_key=True, autoincrement=True)
-    texte = Column(String, nullable=False)
+    texte = Column(String, primary_key=True)
 
-    def __init__(self, id: int, texte: str):
-        self.ID = id
+    def __init__(self, texte: str):
         self.texte = texte
 
     # Relationship avec Contient
@@ -165,7 +163,7 @@ class Contient(Base):
     URL = Column(ForeignKey('t_article.URl'), primary_key=True)
 
     # Foreign Key de Contenue
-    ID = Column(ForeignKey('t_contenu.ID'), primary_key=True)
+    ID = Column(ForeignKey('t_contenu.texte'), primary_key=True)
 
     # Relationship avec Article
     parent_contient = relationship('Article', back_populates="child_contient")
