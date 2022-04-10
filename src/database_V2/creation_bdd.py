@@ -156,3 +156,15 @@ def insert_article(session, element, articles) -> None:
     article = Article(articles.url_surlignage[element], articles.titre[element], date_creation, date_modificication, \
                       articles.etiquette[element], articles.correction[element], articles.url_source[element])
 
+    insert(session, article)
+
+
+def insert_ecritpar(session, element, articles) -> None:
+    """
+    Permet l'insertion des articles des relations entre les articles et les auteurs dans la base de données.
+
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    :param articles: instance de la classe Article.
+    """
+
