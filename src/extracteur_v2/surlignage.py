@@ -152,7 +152,7 @@ class Surlignage:
                 if lien is not None:
                     resultat.append(lien.get(dico_balise['balise']['url']))
                     liens = lien.text.split(",")
-                    txt_no_split = "" if len(liens) == 1 else liens
+                    txt_no_split = lien.text if len(liens) == 1 else ""
                     for texte in liens:
                         if not re.search(self.regex_date, texte):
                             txt_no_split += texte
@@ -160,9 +160,9 @@ class Surlignage:
 
                 else:
                     resultat.append(None)
-                    liens = source.text.split(",")
-                    txt_no_split = "" if len(liens) == 1 else liens
-                    for texte in liens:
+                    sources = source.text.split(",")
+                    txt_no_split = source.text if len(sources) == 1 else ""
+                    for texte in sources:
                         if not re.search(self.regex_date, texte):
                             txt_no_split += texte
                     nom_source.append(normalize_text(txt_no_split))

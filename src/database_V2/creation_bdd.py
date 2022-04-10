@@ -154,7 +154,7 @@ def insert_article(session, element, articles) -> None:
     date_modificication = setup_date(articles.date_modification[element])
 
     article = Article(articles.url_surlignage[element], articles.titre[element][0], date_creation, date_modificication,
-                      articles.etiquette[element], articles.correction[element], articles.url_source[element][0])
+                      articles.correction[element], articles.etiquette[element], articles.url_source[element][0])
 
     q = session.query(Article).filter(Article.URL == article.URL)
     if not session.query(q.exists()).scalar():

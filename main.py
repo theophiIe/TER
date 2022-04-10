@@ -54,19 +54,19 @@ def main(user, pwd, host, port, db):
     # noms_redaction = recuperation_nom(article.redaction, tagger)
     noms_politique = recuperation_nom(article.titre, tagger)
 
-    print("Connexion à la base de donnée")
+    # print("Connexion à la base de donnée")
     engines = connexion(user, pwd, host, port, db)
 
-    print("Insertion élément source :")
+    # print("Insertion élément source :")
     remplissage_source(engines, article)
 
-    print("Insertion élément article :")
+    # print("Insertion élément article :")
     remplissage_article(engines, article)
 
-    print("Insertion élément auteur :")
+    # print("Insertion élément auteur :")
     remplissage_auteur(engines, noms_auteurs)
 
-    print("Insertion élément personnalite :")
+    # print("Insertion élément personnalite :")
     remplissage_personnalite(engines, noms_politique)
 
     print("Fin")
