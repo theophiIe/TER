@@ -5,9 +5,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 from tqdm import tqdm
 
+from src.extracteur_v2.extraction import get_url_all_surlignage
 from src.extracteur_v2.surlignage import Surlignage
 from src.database_V2.table_bdd import Base, Auteur, Personnalite, Article, Source, \
-    Contenu, Reference, ParleDe, EcritPar, Contient, Refere, EnLien
+    Contenu, Reference, ParleDe, EcritPar, Contient, Refere
 from src.extracteur_v2.traitement import recuperation_nom
 from flair.models import SequenceTagger
 
@@ -43,6 +44,9 @@ def setup_date(string: str):
     :param string:
     :return la date restructuré sous format PostgreSQL.
     """
+    if string is None:
+        return None
+
     dictmois = {
         "janvier": "-01-",
         "février": "-02-",
@@ -86,25 +90,22 @@ def insert_auteur(session, element, articles) -> None:
     :param element: numéro d'article courant.
     :param articles: instance de la classe Article.
     """
-
-    for auteur in articles.auteurs:
+    for auteur in articles[element]:
         q = session.query(Auteur).filter(Auteur.nom == auteur)
         if not session.query(q.exists()).scalar():
             insert(session, Auteur(auteur, None))
 
 
-def insert_personnalite(session, element, articles) -> None:
+def insert_personnalite(session, element, personnalite) -> None:
     """
     Permet l'insertion des personnalités (personne sur lequel porte l'article) dans la base de données.
 
     :param session: élément pour l'interaction avec la base de données
     :param element: numéro d'article courant.
-    :param articles: instance de la classe Article.
+    :param personnalite:
     """
-    tagger = SequenceTagger.load("flair/ner-french")
-    personnalite = recuperation_nom(articles.titre, tagger)
     for perso in personnalite[element]:
-        q = session.query(Personnalite).filter(Personnalite.nom == personnalite)
+        q = session.query(Personnalite).filter(Personnalite.nom == perso)
         if not session.query(q.exists()).scalar():
             insert(session, Personnalite(perso))
 
@@ -117,11 +118,10 @@ def insert_source(session, element, articles) -> None:
     :param element: numéro d'article courant.
     :param articles: instance de la classe Article.
     """
-
-    for url, nom in zip(articles.url_source[element], articles.nom_source[element]):
-        q = session.query(Source).filter(Source.url == url)
+    if articles.url_source[element][0] is not None:
+        q = session.query(Source).filter(Source.URL == articles.url_source[element][0])
         if not session.query(q.exists()).scalar():
-            insert(session, Source(url, nom))
+            insert(session, Source(articles.url_source[element][0], articles.nom_source[element][0]))
 
 
 def insert_contenu(session, element, article, articles) -> None:
@@ -153,6 +153,69 @@ def insert_article(session, element, articles) -> None:
     date_creation = setup_date(articles.date_creation[element])
     date_modificication = setup_date(articles.date_modification[element])
 
-    article = Article(articles.url_surlignage[element], articles.titre[element], date_creation, date_modificication, \
-                      articles.etiquette[element], articles.correction[element], articles.url_source[element])
+    article = Article(articles.url_surlignage[element], articles.titre[element][0], date_creation, date_modificication,
+                      articles.etiquette[element], articles.correction[element], articles.url_source[element][0])
 
+    q = session.query(Article).filter(Article.URL == article.URL)
+    if not session.query(q.exists()).scalar():
+        insert(session, article)
+
+
+def remplissage_article(engine, article) -> None:
+    """
+    Permet de remplir la base de données.
+
+    :param article:
+    :param engine : MockConnection de la base de données.
+    """
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Progression')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_article(session, element, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_auteur(engine, auteurs) -> None:
+    """
+    Permet de remplir la base de données.
+
+    :param auteurs:
+    :param engine : MockConnection de la base de données.
+    """
+    pbar = tqdm(range(len(auteurs)), colour='green', desc='Progression')
+    with Session(bind=engine) as session:
+        for element in range(len(auteurs)):
+            insert_auteur(session, element, auteurs)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_personnalite(engine, personnalite) -> None:
+    """
+    Permet de remplir la base de données.
+
+    :param personnalite:
+    :param engine : MockConnection de la base de données.
+    """
+    pbar = tqdm(range(len(personnalite)), colour='green', desc='Progression')
+    with Session(bind=engine) as session:
+        for element in range(len(personnalite)):
+            insert_personnalite(session, element, personnalite)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_source(engine, article) -> None:
+    """
+    Permet de remplir la base de données.
+
+    :param source:
+    :param engine : MockConnection de la base de données.
+    """
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Progression')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_source(session, element, article)
+            pbar.update(1)
+            pbar.refresh()

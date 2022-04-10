@@ -142,7 +142,7 @@ class Surlignage:
 
     def get_source_surlignage(self, page, dico_balise) -> None:
         paragraphe = page.find(class_=dico_balise['class']['sources'])
-        resultat = None
+        resultat = []
         nom_source = []
 
         if paragraphe is not None:
@@ -150,17 +150,22 @@ class Surlignage:
             if source is not None:
                 lien = source.find(dico_balise['balise']['lien'])
                 if lien is not None:
-                    resultat = lien.get(dico_balise['balise']['url'])
+                    resultat.append(lien.get(dico_balise['balise']['url']))
                     liens = lien.text.split(",")
+                    txt_no_split = "" if len(liens) == 1 else liens
                     for texte in liens:
                         if not re.search(self.regex_date, texte):
-                            nom_source.append(normalize_text(texte))
+                            txt_no_split += texte
+                    nom_source.append(normalize_text(txt_no_split))
 
                 else:
+                    resultat.append(None)
                     liens = source.text.split(",")
+                    txt_no_split = "" if len(liens) == 1 else liens
                     for texte in liens:
                         if not re.search(self.regex_date, texte):
-                            nom_source.append(normalize_text(texte))
+                            txt_no_split += texte
+                    nom_source.append(normalize_text(txt_no_split))
 
         self.nom_source.append(nom_source)
         self.url_source.append(resultat)

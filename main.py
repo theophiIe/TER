@@ -1,29 +1,73 @@
 import argparse
+import json
+from pprint import pprint
 
 from flair.models import SequenceTagger
 
-from src.database.creation_bd import connexion, remplissage
+from src.database_V2.creation_bdd import connexion, remplissage_auteur, remplissage_article, remplissage_personnalite, \
+    remplissage_source
 from src.extracteur.scrapping import scrap_article_court, scrap_article_long
+from src.extracteur_v2.extraction import get_url_all_surlignage, remplir_surlignage
+from src.extracteur_v2.surlignage import Surlignage
+from src.extracteur_v2.traitement import recuperation_nom
+
+
+# def main_old(user, pwd, host, port, db):
+#     print("Chargement de Flair french")
+#     tagger = SequenceTagger.load("flair/ner-french")
+#
+#     print("Scrapping information article court :")
+#     articles_court = scrap_article_court(tagger)
+#
+#     print("Scrapping information article long :")
+#     articles_long = scrap_article_long(tagger)
+#
+#     print("Connexion à la base de donnée")
+#     engines = connexion(user, pwd, host, port, db)
+#
+#     print("Insertion élément article court :")
+#     remplissage(engines, articles_court)
+#
+#     print("Insertion élément article long :")
+#     remplissage(engines, articles_long)
+#
+#     print("Fin")
+#     pass
 
 
 def main(user, pwd, host, port, db):
+    with open("balise.json") as json_file:
+        balise = json.load(json_file)
+
+    article = Surlignage()
+
+    print("Scrapping url article :")
+    get_url_all_surlignage(article, balise)
+
+    print("Scrapping information article :")
+    remplir_surlignage(article, balise)
+
     print("Chargement de Flair french")
     tagger = SequenceTagger.load("flair/ner-french")
-
-    print("Scrapping information article court :")
-    articles_court = scrap_article_court(tagger)
-
-    print("Scrapping information article long :")
-    articles_long = scrap_article_long(tagger)
+    noms_auteurs = recuperation_nom(article.auteurs, tagger)
+    # noms_relecteurs = recuperation_nom(article.relecteurs, tagger)
+    # noms_redaction = recuperation_nom(article.redaction, tagger)
+    noms_politique = recuperation_nom(article.titre, tagger)
 
     print("Connexion à la base de donnée")
     engines = connexion(user, pwd, host, port, db)
 
-    print("Insertion élément article court :")
-    remplissage(engines, articles_court)
+    print("Insertion élément source :")
+    remplissage_source(engines, article)
 
-    print("Insertion élément article long :")
-    remplissage(engines, articles_long)
+    print("Insertion élément article :")
+    remplissage_article(engines, article)
+
+    print("Insertion élément auteur :")
+    remplissage_auteur(engines, noms_auteurs)
+
+    print("Insertion élément personnalite :")
+    remplissage_personnalite(engines, noms_politique)
 
     print("Fin")
 
