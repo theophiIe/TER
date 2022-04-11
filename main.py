@@ -5,7 +5,8 @@ from pprint import pprint
 from flair.models import SequenceTagger
 
 from src.database_V2.creation_bdd import connexion, remplissage_auteur, remplissage_article, remplissage_personnalite, \
-    remplissage_source, remplissage_contenu, remplissage_ecrit_par, remplissage_parlede, remplissage_reference
+    remplissage_source, remplissage_contenu, remplissage_ecrit_par, remplissage_parlede, remplissage_reference, \
+    remplissage_refere, remplissage_contient
 from src.extracteur.scrapping import scrap_article_court, scrap_article_long
 from src.extracteur_v2.extraction import get_url_all_surlignage, remplir_surlignage
 from src.extracteur_v2.surlignage import Surlignage
@@ -78,6 +79,10 @@ def main(user, pwd, host, port, db):
     remplissage_parlede(engines, noms_politique, article)
 
     remplissage_reference(engines, article)
+
+    remplissage_refere(engines, article)
+
+    remplissage_contient(engines, article)
 
     print("Fin")
 
