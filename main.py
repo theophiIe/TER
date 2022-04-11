@@ -5,7 +5,7 @@ from pprint import pprint
 from flair.models import SequenceTagger
 
 from src.database_V2.creation_bdd import connexion, remplissage_auteur, remplissage_article, remplissage_personnalite, \
-    remplissage_source
+    remplissage_source, remplissage_contenu, remplissage_ecrit_par, remplissage_parlede, remplissage_reference
 from src.extracteur.scrapping import scrap_article_court, scrap_article_long
 from src.extracteur_v2.extraction import get_url_all_surlignage, remplir_surlignage
 from src.extracteur_v2.surlignage import Surlignage
@@ -50,8 +50,8 @@ def main(user, pwd, host, port, db):
     print("Chargement de Flair french")
     tagger = SequenceTagger.load("flair/ner-french")
     noms_auteurs = recuperation_nom(article.auteurs, tagger)
-    # noms_relecteurs = recuperation_nom(article.relecteurs, tagger)
-    # noms_redaction = recuperation_nom(article.redaction, tagger)
+    noms_relecteurs = recuperation_nom(article.relecteurs, tagger)
+    noms_redaction = recuperation_nom(article.redaction, tagger)
     noms_politique = recuperation_nom(article.titre, tagger)
 
     # print("Connexion à la base de donnée")
@@ -65,9 +65,19 @@ def main(user, pwd, host, port, db):
 
     # print("Insertion élément auteur :")
     remplissage_auteur(engines, noms_auteurs)
+    remplissage_auteur(engines, noms_relecteurs)
+    remplissage_auteur(engines, noms_redaction)
 
     # print("Insertion élément personnalite :")
     remplissage_personnalite(engines, noms_politique)
+
+    remplissage_contenu(engines, article)
+
+    remplissage_ecrit_par(engines, article, noms_auteurs, noms_relecteurs, noms_redaction)
+
+    remplissage_parlede(engines, noms_politique, article)
+
+    remplissage_reference(engines, article)
 
     print("Fin")
 
