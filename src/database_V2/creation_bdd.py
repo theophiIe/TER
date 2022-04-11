@@ -5,12 +5,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 from tqdm import tqdm
 
-from src.extracteur_v2.extraction import get_url_all_surlignage
-from src.extracteur_v2.surlignage import Surlignage
 from src.database_V2.table_bdd import Base, Auteur, Personnalite, Article, Source, \
     Contenu, Reference, ParleDe, EcritPar, Contient, Refere, ArticleEnLien, EnLien
-from src.extracteur_v2.traitement import recuperation_nom
-from flair.models import SequenceTagger
 
 
 def connexion(user, pwd, host, port, name):

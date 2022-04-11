@@ -1,9 +1,8 @@
-from sqlalchemy import Column, String, ForeignKey, Integer, Date, Table
+from sqlalchemy import Column, String, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
-
 
 
 class Auteur(Base):

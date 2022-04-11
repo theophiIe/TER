@@ -33,27 +33,3 @@ def recuperation_nom(tab_nom, tagger) -> []:
         pbar.refresh()
 
     return nom_final
-
-
-if __name__ == '__main__':
-    ar_surlignage = Surlignage()
-
-    with open("../../balise.json") as json_file:
-        balise = json.load(json_file)
-
-    get_url_all_surlignage(ar_surlignage, balise)
-    remplir_surlignage(ar_surlignage, balise)
-
-    tagger = SequenceTagger.load("flair/ner-french")
-    noms_auteurs = recuperation_nom(ar_surlignage.auteurs, tagger)
-    noms_relecteurs = recuperation_nom(ar_surlignage.relecteurs, tagger)
-    noms_redaction = recuperation_nom(ar_surlignage.redaction, tagger)
-    noms_politique = recuperation_nom(ar_surlignage.titre, tagger)
-
-    for i in range(len(ar_surlignage.titre)):
-        pprint(ar_surlignage.titre[i])
-        # pprint(f'relecteur : {ar_surlignage.relecteurs[i]}')
-        # pprint(f'redaction : {ar_surlignage.redaction[i]}')
-        pprint(noms_relecteurs[i])
-        pprint(noms_redaction[i])
-        pprint(noms_politique[i])
