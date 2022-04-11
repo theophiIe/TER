@@ -124,7 +124,7 @@ def insert_source(session, element, articles) -> None:
             insert(session, Source(articles.url_source[element][0], articles.nom_source[element][0]))
 
 
-def insert_contenu(session, element, article, articles) -> None:
+def insert_contenu(session, element, articles) -> None:
     """
     Permet l'insertion du contenu de l'article dans la base de données.
 
@@ -161,6 +161,62 @@ def insert_article(session, element, articles) -> None:
         insert(session, article)
 
 
+def insert_ecritpar(session, element, auteurs, relecteurs, secretariats, article) -> None:
+    """
+    Permet l'insertion des articles de type court dans la base de données.
+
+    :param article:
+    :param secretariats:
+    :param relecteurs:
+    :param auteurs:
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    """
+
+    for auteur in auteurs[element]:
+        q = session.query(EcritPar).filter(EcritPar.nom == auteur).filter(EcritPar.URL == article.url_surlignage[element])
+        if not session.query(q.exists()).scalar():
+            ecrit_par = EcritPar(article.url_surlignage[element], auteur, "Auteur")
+            insert(session, ecrit_par)
+
+    for relecteur in relecteurs[element]:
+        q = session.query(EcritPar).filter(EcritPar.nom == relecteur).filter(EcritPar.URL == article.url_surlignage[element])
+        if not session.query(q.exists()).scalar():
+            ecrit_par = EcritPar(article.url_surlignage[element], relecteur, "Relecteur")
+            insert(session, ecrit_par)
+
+    for secretariat in secretariats[element]:
+        q = session.query(EcritPar).filter(EcritPar.nom == secretariat).filter(EcritPar.URL == article.url_surlignage[element])
+        if not session.query(q.exists()).scalar():
+            ecrit_par = EcritPar(article.url_surlignage[element], secretariat, "Secretariat")
+            insert(session, ecrit_par)
+
+
+def insert_parlede(session, element, personnalite, article) -> None:
+    """
+    Permet l'insertion des articles de type court dans la base de données.
+
+    :param personnalite:
+    :param article:
+    :param session: élément pour l'interaction avec la base de données
+    :param element: numéro d'article courant.
+    """
+
+    for auteur in personnalite[element]:
+        q = session.query(ParleDe).filter(ParleDe.nom == auteur).filter(ParleDe.URL == article.url_surlignage[element])
+        if not session.query(q.exists()).scalar():
+            parle_de = ParleDe(article.url_surlignage[element], auteur)
+            insert(session, parle_de)
+
+
+def insert_reference(session, element, article) -> None:
+    for ref in range(len(article.url_references[element])):
+        if article.url_references[element][ref] is not None:
+            q = session.query(Reference).filter(Reference.URL == article.url_references[element][ref])
+            if not session.query(q.exists()).scalar():
+                insert(session, Reference(article.url_references[element][ref], article.nom_references[element][ref]))
+
+
 def remplissage_article(engine, article) -> None:
     """
     Permet de remplir la base de données.
@@ -168,7 +224,7 @@ def remplissage_article(engine, article) -> None:
     :param article:
     :param engine : MockConnection de la base de données.
     """
-    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Progression')
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage article')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
             insert_article(session, element, article)
@@ -183,7 +239,7 @@ def remplissage_auteur(engine, auteurs) -> None:
     :param auteurs:
     :param engine : MockConnection de la base de données.
     """
-    pbar = tqdm(range(len(auteurs)), colour='green', desc='Progression')
+    pbar = tqdm(range(len(auteurs)), colour='green', desc='Remplissage auteur')
     with Session(bind=engine) as session:
         for element in range(len(auteurs)):
             insert_auteur(session, element, auteurs)
@@ -198,7 +254,7 @@ def remplissage_personnalite(engine, personnalite) -> None:
     :param personnalite:
     :param engine : MockConnection de la base de données.
     """
-    pbar = tqdm(range(len(personnalite)), colour='green', desc='Progression')
+    pbar = tqdm(range(len(personnalite)), colour='green', desc='Remplissage personnalité')
     with Session(bind=engine) as session:
         for element in range(len(personnalite)):
             insert_personnalite(session, element, personnalite)
@@ -213,9 +269,52 @@ def remplissage_source(engine, article) -> None:
     :param source:
     :param engine : MockConnection de la base de données.
     """
-    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Progression')
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage source')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
             insert_source(session, element, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_contenu(engine, article):
+    """
+    Permet de remplir la base de données.
+
+    :param article:
+    :param contenu:
+    :param engine : MockConnection de la base de données.
+    """
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage contenu')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_contenu(session, element, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_ecrit_par(engine, article, auteurs, relecteurs, secretariat):
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage ecrit_par')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_ecritpar(session, element, auteurs, relecteurs, secretariat, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_parlede(engine, personnalite, article):
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage parle_de')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_parlede(session, element, personnalite, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_reference(engine, article):
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage Reference')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_reference(session, element, article)
             pbar.update(1)
             pbar.refresh()
