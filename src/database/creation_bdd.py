@@ -207,46 +207,47 @@ def insert_parlede(session, element, personnalite, article) -> None:
 
 def insert_reference(session, element, article) -> None:
 
-    for ref, elem in enumerate(article.url_references[element]):
-        if article.url_references[element][ref] is not None:
-            q = session.query(Reference).filter(Reference.URL == article.url_references[element][ref])
+    for ref in enumerate(article.url_references[element]):
+        if article.url_references[element][ref[0]] is not None:
+            q = session.query(Reference).filter(Reference.URL == article.url_references[element][ref[0]])
             if not session.query(q.exists()).scalar():
-                insert(session, Reference(article.url_references[element][ref], article.nom_references[element][ref]))
+                insert(session, Reference(article.url_references[element][ref[0]],
+                                          article.nom_references[element][ref[0]]))
 
 
 def insert_refere(session, element, article) -> None:
-    for ref, elem in enumerate(article.url_references[element]):
-        if article.url_references[element][ref] is not None:
+    for ref in enumerate(article.url_references[element]):
+        if article.url_references[element][ref[0]] is not None:
             q = session.query(Refere).filter(Refere.URL_article == article.url_surlignage[element]) \
-                .filter(Refere.URL_reference == article.url_references[element][ref])
+                .filter(Refere.URL_reference == article.url_references[element][ref[0]])
             if not session.query(q.exists()).scalar():
-                insert(session, Refere(article.url_surlignage[element], article.url_references[element][ref]))
+                insert(session, Refere(article.url_surlignage[element], article.url_references[element][ref[0]]))
 
 
 def insert_contient(session, element, article) -> None:
-    for paragraphe, elem in enumerate(article.contenu[element]):
-        if article.contenu[element][paragraphe] not in [None, " ", ""]:
+    for paragraphe in enumerate(article.contenu[element]):
+        if article.contenu[element][paragraphe[0]] not in [None, " ", ""]:
             q = session.query(Contient).filter(Contient.URL == article.url_surlignage[element]) \
-                .filter(Contient.ID == article.contenu[element][paragraphe])
+                .filter(Contient.ID == article.contenu[element][paragraphe[0]])
             if not session.query(q.exists()).scalar():
-                insert(session, Contient(article.url_surlignage[element], article.contenu[element][paragraphe]))
+                insert(session, Contient(article.url_surlignage[element], article.contenu[element][paragraphe[0]]))
 
 
 def insert_article_en_lien(session, element, articles) -> None:
-    for article, elem in enumerate(articles.meme_theme[element]):
-        if article is not None:
-            q = session.query(ArticleEnLien).filter(ArticleEnLien.URL == articles.meme_theme[element][article])
+    for article in enumerate(articles.meme_theme[element]):
+        if article[0] is not None:
+            q = session.query(ArticleEnLien).filter(ArticleEnLien.URL == articles.meme_theme[element][article[0]])
             if not session.query(q.exists()).scalar():
-                insert(session, ArticleEnLien(articles.meme_theme[element][article]))
+                insert(session, ArticleEnLien(articles.meme_theme[element][article[0]]))
 
 
 def insert_en_lien(session, element, articles) -> None:
-    for article_lien, elem in enumerate(articles.meme_theme[element]):
-        if articles.meme_theme[element][article_lien] is not None:
+    for article_lien in enumerate(articles.meme_theme[element]):
+        if articles.meme_theme[element][article_lien[0]] is not None:
             q = session.query(EnLien).filter(EnLien.URL_article == articles.url_surlignage[element]) \
-                .filter(EnLien.URL_article_en_lien == articles.meme_theme[element][article_lien])
+                .filter(EnLien.URL_article_en_lien == articles.meme_theme[element][article_lien[0]])
             if not session.query(q.exists()).scalar():
-                insert(session, EnLien(articles.url_surlignage[element], articles.meme_theme[element][article_lien]))
+                insert(session, EnLien(articles.url_surlignage[element], articles.meme_theme[element][article_lien[0]]))
 
 
 def remplissage_article(engine, article) -> None:
