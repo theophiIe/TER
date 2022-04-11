@@ -39,7 +39,7 @@ class Article(Base):
     date_creation = Column(Date, nullable=False)
     date_modification = Column(Date)
     etiquette = Column(String, nullable=True)
-    correction = Column(String, nullable=False)
+    correction = Column(String, nullable=True)
 
     # Foreign Key de source
     source = Column(String, ForeignKey('t_source.URL'))

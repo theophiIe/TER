@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from lxml import etree
 from tqdm import tqdm
 
 
@@ -33,15 +34,16 @@ def remplir_surlignage(surlignage, balise) -> None:
     for page in surlignage.url_surlignage:
         article = requests.get(page)
         soup = BeautifulSoup(article.content, 'lxml')
-        surlignage.get_titre_surlignage(soup, balise)
-        surlignage.get_etiquette_surlignage(soup, balise)
-        surlignage.get_date_surlignage(soup, balise)
-        surlignage.get_meme_theme_surlignage(soup, balise)
-        surlignage.get_auteurs_surlignage(soup, balise)
-        surlignage.get_source_surlignage(soup, balise)
+        dom = etree.HTML(str(soup))
+        surlignage.get_titre_surlignage(dom, balise)
+        surlignage.get_etiquette_surlignage(dom, balise)
+        surlignage.get_date_surlignage(dom, balise)
+        surlignage.get_meme_theme_surlignage(dom, balise)
+        surlignage.get_auteurs_surlignage(soup, dom, balise)
+        surlignage.get_source_surlignage(dom, balise)
         surlignage.get_contenu_surlignage(soup, balise)
         surlignage.get_reference_surlignage(soup, balise)
-        surlignage.get_correction_surlignage(soup, balise)
+        surlignage.get_correction_surlignage(dom, balise)
 
         pbar.update(1)
         pbar.refresh()

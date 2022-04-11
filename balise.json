@@ -1,6 +1,6 @@
 {
   "balise": {
-    "titre" : "h1",
+    "titre" : "//*[@id=\"surlignages\"]/div/div[2]/div[1]/div[2]/h1",
     "lien" : "a",
     "url" : "href",
     "paragraphe" : "p",
@@ -16,6 +16,21 @@
     "sources" : "col-md-8",
     "correction" : "correction",
     "contenue" : "texte"
+  },
+
+  "xpath": {
+    "titre" : "//*[@id=\"surlignages\"]/div/div[2]/div[1]/div[2]/h1/text()",
+    "etiquette" : "//*[@id=\"surlignages\"]/div/div[2]/div[1]/div[2]/button/text()",
+    "meme_theme_1" : "//*[@id=\"grid\"]/div[2]/div/a/@href",
+    "meme_theme_2" : "//*[@id=\"grid\"]/div[3]/div/a/@href",
+    "meme_theme_3" : "//*[@id=\"grid\"]/div[4]/div/a/@href",
+    "date_creation" : "//*[@id=\"surlignages\"]/div/div[2]/div[2]/div[1]/div[1]/text()[1]",
+    "date_modification" : "//*[@id=\"surlignages\"]/div/div[2]/div[2]/div[1]/div[1]/text()[2]",
+    "correction" : "//*[@id=\"surlignages\"]/div/div[2]/div[2]/div[2]/div[1]/text()",
+    "auteur" : "//*[@id=\"surlignages\"]/div/div[2]/div[2]/div[2]/div[2]/text()",
+    "contributeur" : "//*[@id=\"surlignages\"]/div/div[2]/div[2]/div[1]/div[2]",
+    "nom_source" : "//*[@id=\"surlignages\"]/div/div[2]/div[2]/div[2]/h2/a/text()",
+    "url_source" : "//*[@id=\"surlignages\"]/div/div[2]/div[2]/div[2]/h2/a/@href"
   }
 
 

@@ -34,46 +34,53 @@ class Surlignage:
             for lien in article.find_all(dico_balise['balise']['lien']):
                 self.url_surlignage.append(lien.get(dico_balise['balise']['url']))
 
-    def get_titre_surlignage(self, page, dico_balise) -> None:
-        titre = page.find(dico_balise['balise']['titre'])
+    def get_titre_surlignage(self, dom, dico_balise) -> None:
+        titre = dom.xpath(dico_balise['xpath']['titre'])
         contenu_titre = []
 
         if titre is not None:
-            res = titre.text if titre.text != '' else None
+            res = titre[0] if titre[0] != '' else None
             contenu_titre.append(normalize_text(res))
 
         self.titre.append(contenu_titre)
 
-    def get_etiquette_surlignage(self, page, dico_balise) -> None:
-        etiquette = page.find(class_=dico_balise['class']['etiquette'])
-        contenu_etiquette = None
+    def get_etiquette_surlignage(self, dom, dico_balise) -> None:
+        self.etiquette.append(normalize_text(dom.xpath(dico_balise['xpath']['etiquette'])[0]))
 
-        if etiquette is not None:
-            contenu_etiquette = etiquette.text if etiquette.text != '' else None
-        self.etiquette.append(normalize_text(contenu_etiquette))
-
-    def get_meme_theme_surlignage(self, page, dico_balise) -> None:
+    def get_meme_theme_surlignage(self, dom, dico_balise) -> None:
         url_meme_theme = []
-        meme_theme = page.find_all(class_=dico_balise['class']['container_article'])
 
-        for article in meme_theme:
-            for lien in article.find_all(dico_balise['balise']['lien']):
-                url_meme_theme.append(lien.get(dico_balise['balise']['url']))
+        res1 = dom.xpath(dico_balise['xpath']['meme_theme_1'])
+        res2 = dom.xpath(dico_balise['xpath']['meme_theme_2'])
+        res3 = dom.xpath(dico_balise['xpath']['meme_theme_3'])
+
+        if res1:
+            url_meme_theme.append(res1[0])
+
+        if res2:
+            url_meme_theme.append(res2[0])
+
+        if res3:
+            url_meme_theme.append(res3[0])
 
         self.meme_theme.append(url_meme_theme)
 
-    def get_date_surlignage(self, page, dico_balise) -> None:
-        dates = page.find(class_=dico_balise['class']['date'])
-        date_creation = None
-        date_modification = None
+    def get_date_surlignage(self, dom, dico_balise) -> None:
+        date_creation = dom.xpath(dico_balise['xpath']['date_creation'])
+        date_modification = dom.xpath(dico_balise['xpath']['date_modification'])
 
-        if dates is not None and re.search(self.regex_date, dates.text):
-            date_creation = re.findall(self.regex_date, dates.text)[0]
-            if len(re.findall(self.regex_date, dates.text)) > 1:
-                date_modification = re.findall(self.regex_date, dates.text)[1]
+        if date_creation and date_creation[0] is not None and re.search(self.regex_date, date_creation[0]):
+            res_date_creation = re.findall(self.regex_date, date_creation[0])[0]
+            self.date_creation.append(res_date_creation)
+        else:
+            self.date_creation.append(None)
 
-        self.date_creation.append(date_creation)
-        self.date_modification.append(date_modification)
+        if date_modification and date_modification[0] is not None \
+                and re.search(self.regex_date, date_modification[0]):
+            res_date_modification = re.findall(self.regex_date, date_modification[0])[0]
+            self.date_modification.append(res_date_modification)
+        else:
+            self.date_modification.append(None)
 
     # Pour la V2
     def __get_contributeur(self, page, dico_balise) -> bool:
@@ -126,55 +133,45 @@ class Surlignage:
             return False
 
     # Pour la V1
-    def __get_auteurs(self, page, dico_balise) -> None:
-        auteurs = page.find(class_=dico_balise['class']['auteurs'])
-        auteur = []
-
-        if auteurs is not None:
-            auteur.append(normalize_text(auteurs.text))
-
-        self.auteurs.append(auteur)
-
-    def get_auteurs_surlignage(self, page, dico_balise) -> None:
-        if not self.__get_contributeur(page, dico_balise):
-            self.__get_auteurs(page, dico_balise)
-
-    def get_source_surlignage(self, page, dico_balise) -> None:
-        paragraphe = page.find(class_=dico_balise['class']['sources'])
+    def __get_auteurs(self, dom, dico_balise) -> None:
+        auteur = dom.xpath(dico_balise['xpath']['auteur'])
         resultat = []
-        nom_source = []
 
-        if paragraphe is not None:
-            source = paragraphe.find(dico_balise['balise']['sous_titre'])
-            if source is not None:
-                lien = source.find(dico_balise['balise']['lien'])
-                if lien is not None:
-                    resultat.append(lien.get(dico_balise['balise']['url']))
-                    liens = lien.text.split(",")
-                    txt_no_split = lien.text if len(liens) == 1 else ""
-                    for texte in liens:
-                        if not re.search(self.regex_date, texte):
-                            txt_no_split += texte
-                    nom_source.append(normalize_text(txt_no_split))
+        if auteur[0] != "":
+            resultat.append(normalize_text(auteur[0]))
 
-                else:
-                    resultat.append(None)
-                    sources = source.text.split(",")
-                    txt_no_split = source.text if len(sources) == 1 else ""
-                    for texte in sources:
-                        if not re.search(self.regex_date, texte):
-                            txt_no_split += texte
-                    nom_source.append(normalize_text(txt_no_split))
+        self.auteurs.append(resultat)
 
-        self.nom_source.append(nom_source)
-        self.url_source.append(resultat)
+    def get_auteurs_surlignage(self, page, dom, dico_balise) -> None:
+        if not self.__get_contributeur(page, dico_balise):
+            self.__get_auteurs(dom, dico_balise)
 
-    def get_correction_surlignage(self, page, dico_balise) -> None:
-        correction = page.find(class_=dico_balise['class']['correction'])
+    def get_source_surlignage(self, dom, dico_balise) -> None:
+        url_source = dom.xpath(dico_balise['xpath']['url_source'])
+        nom_source = dom.xpath(dico_balise['xpath']['nom_source'])
+
+        url = []
+        nom = []
+
+        if url_source:
+            url.append(url_source[0])
+        else:
+            url.append(None)
+
+        if nom_source:
+            nom.append(nom_source[0])
+        else:
+            nom.append(None)
+
+        self.url_source.append(url)
+        self.nom_source.append(nom)
+
+    def get_correction_surlignage(self, dom, dico_balise) -> None:
+        correction = dom.xpath(dico_balise['xpath']['correction'])
         resultat = None
 
-        if correction is not None:
-            resultat = normalize_text(correction.text)
+        if correction:
+            resultat = normalize_text(correction[0])
         self.correction.append(resultat)
 
     def get_contenu_surlignage(self, page, dico_balise) -> None:
