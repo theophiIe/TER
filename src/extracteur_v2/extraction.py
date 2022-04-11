@@ -24,7 +24,7 @@ def get_nombre_articles(page, dico_balise) -> int:
 
 
 def get_url_all_surlignage(article, dico_balise) -> None:
-    pbar = tqdm(range(1, get_nombre_pages(article.url) + 1), colour='green', desc='Obtention des urls des articles')
+    pbar = tqdm(range(1, get_nombre_pages(article.url) + 1), colour='green', desc='Obtention des urls des articles:')
     for page in range(1, get_nombre_pages(article.url) + 1):
         page = requests.get(f'{article.url}/page/{page}/')
         soup = BeautifulSoup(page.content, 'lxml')
@@ -35,7 +35,7 @@ def get_url_all_surlignage(article, dico_balise) -> None:
 
 
 def remplir_surlignage(surlignage, balise) -> None:
-    pbar = tqdm(range(len(surlignage.url_surlignage)), colour='green', desc='Remplissage')
+    pbar = tqdm(range(len(surlignage.url_surlignage)), colour='green', desc='Remplissage surlignage:')
     for page in surlignage.url_surlignage:
         article = requests.get(page)
         soup = BeautifulSoup(article.content, 'lxml')
@@ -55,7 +55,7 @@ def remplir_surlignage(surlignage, balise) -> None:
 
 def debug(surlignage) -> None:
     print("Début debug")
-    pbar = tqdm(range(len(surlignage.url_surlignage)), colour='green', desc='Remplissage')
+    pbar = tqdm(range(len(surlignage.url_surlignage)), colour='green', desc='Debug:')
     for i in range(len(surlignage.titre)):
         print(f"Article num: {i+1}, page: {(i+1)%20}")
         pprint(surlignage.titre[i])
