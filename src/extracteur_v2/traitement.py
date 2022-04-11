@@ -15,7 +15,7 @@ from unidecode import unidecode
 def recuperation_nom(tab_nom, tagger) -> []:
     nom_final = []
 
-    pbar = tqdm(range(len(tab_nom)), colour='green', desc='Remplissage')
+    pbar = tqdm(range(len(tab_nom)), colour='green', desc='Flair analyse nom')
     for noms in tab_nom:
         nom_tmp = []
         if noms is not None:
