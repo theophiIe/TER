@@ -67,11 +67,10 @@ class Surlignage:
         date_creation = None
         date_modification = None
 
-        if dates is not None:
-            if re.search(self.regex_date, dates.text):
-                date_creation = re.findall(self.regex_date, dates.text)[0]
-                if len(re.findall(self.regex_date, dates.text)) > 1:
-                    date_modification = re.findall(self.regex_date, dates.text)[1]
+        if dates is not None and re.search(self.regex_date, dates.text):
+            date_creation = re.findall(self.regex_date, dates.text)[0]
+            if len(re.findall(self.regex_date, dates.text)) > 1:
+                date_modification = re.findall(self.regex_date, dates.text)[1]
 
         self.date_creation.append(date_creation)
         self.date_modification.append(date_modification)

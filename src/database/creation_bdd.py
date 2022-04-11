@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 from tqdm import tqdm
 
-from src.database_V2.table_bdd import Base, Auteur, Personnalite, Article, Source, \
+from src.database.table_bdd import Base, Auteur, Personnalite, Article, Source, \
     Contenu, Reference, ParleDe, EcritPar, Contient, Refere, ArticleEnLien, EnLien
 
 
@@ -207,7 +207,7 @@ def insert_parlede(session, element, personnalite, article) -> None:
 
 def insert_reference(session, element, article) -> None:
 
-    for ref in range(len(article.url_references[element])):
+    for ref, elem in enumerate(article.url_references[element]):
         if article.url_references[element][ref] is not None:
             q = session.query(Reference).filter(Reference.URL == article.url_references[element][ref])
             if not session.query(q.exists()).scalar():
@@ -215,7 +215,7 @@ def insert_reference(session, element, article) -> None:
 
 
 def insert_refere(session, element, article) -> None:
-    for ref in range(len(article.url_references[element])):
+    for ref, elem in enumerate(article.url_references[element]):
         if article.url_references[element][ref] is not None:
             q = session.query(Refere).filter(Refere.URL_article == article.url_surlignage[element]) \
                 .filter(Refere.URL_reference == article.url_references[element][ref])
@@ -224,7 +224,7 @@ def insert_refere(session, element, article) -> None:
 
 
 def insert_contient(session, element, article) -> None:
-    for paragraphe in range(len(article.contenu[element])):
+    for paragraphe, elem in enumerate(article.contenu[element]):
         if article.contenu[element][paragraphe] not in [None, " ", ""]:
             q = session.query(Contient).filter(Contient.URL == article.url_surlignage[element]) \
                 .filter(Contient.ID == article.contenu[element][paragraphe])
@@ -233,7 +233,7 @@ def insert_contient(session, element, article) -> None:
 
 
 def insert_article_en_lien(session, element, articles) -> None:
-    for article in range(len(articles.meme_theme[element])):
+    for article, elem in enumerate(articles.meme_theme[element]):
         if article is not None:
             q = session.query(ArticleEnLien).filter(ArticleEnLien.URL == articles.meme_theme[element][article])
             if not session.query(q.exists()).scalar():
@@ -241,7 +241,7 @@ def insert_article_en_lien(session, element, articles) -> None:
 
 
 def insert_en_lien(session, element, articles) -> None:
-    for article_lien in range(len(articles.meme_theme[element])):
+    for article_lien, elem in enumerate(articles.meme_theme[element]):
         if articles.meme_theme[element][article_lien] is not None:
             q = session.query(EnLien).filter(EnLien.URL_article == articles.url_surlignage[element]) \
                 .filter(EnLien.URL_article_en_lien == articles.meme_theme[element][article_lien])

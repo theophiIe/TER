@@ -1,13 +1,6 @@
-import json
-
 from tqdm import tqdm
-from pprint import pprint
 
 from flair.data import Sentence
-from flair.models import SequenceTagger
-
-from src.extracteur_v2.extraction import get_url_all_surlignage, remplir_surlignage
-from src.extracteur_v2.surlignage import Surlignage
 
 from unidecode import unidecode
 

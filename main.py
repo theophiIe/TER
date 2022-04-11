@@ -3,12 +3,12 @@ import json
 
 from flair.models import SequenceTagger
 
-from src.database_V2.creation_bdd import connexion, remplissage_auteur, remplissage_article, remplissage_personnalite, \
+from src.database.creation_bdd import connexion, remplissage_auteur, remplissage_article, remplissage_personnalite, \
     remplissage_source, remplissage_contenu, remplissage_ecrit_par, remplissage_parlede, remplissage_reference, \
     remplissage_refere, remplissage_contient, remplissage_article_en_lien, remplissage_en_lien
-from src.extracteur_v2.extraction import get_url_all_surlignage, remplir_surlignage
-from src.extracteur_v2.surlignage import Surlignage
-from src.extracteur_v2.traitement import recuperation_nom
+from src.extracteur.extraction import get_url_all_surlignage, remplir_surlignage
+from src.extracteur.surlignage import Surlignage
+from src.extracteur.traitement import recuperation_nom
 
 
 def main(user, pwd, host, port, db):
@@ -20,7 +20,6 @@ def main(user, pwd, host, port, db):
     print("Scrapping url article :")
     get_url_all_surlignage(article, balise)
 
-    # print("Scrapping information article :")
     remplir_surlignage(article, balise)
 
     print("Chargement de Flair french:")
@@ -30,37 +29,21 @@ def main(user, pwd, host, port, db):
     noms_redaction = recuperation_nom(article.redaction, tagger)
     noms_politique = recuperation_nom(article.titre, tagger)
 
-    # print("Connexion à la base de donnée")
     engines = connexion(user, pwd, host, port, db)
 
-    # print("Insertion élément source :")
     remplissage_source(engines, article)
-
-    # print("Insertion élément article :")
     remplissage_article(engines, article)
-
-    # print("Insertion élément auteur :")
     remplissage_auteur(engines, noms_auteurs)
     remplissage_auteur(engines, noms_relecteurs)
     remplissage_auteur(engines, noms_redaction)
-
-    # print("Insertion élément personnalite :")
     remplissage_personnalite(engines, noms_politique)
-
     remplissage_contenu(engines, article)
-
     remplissage_ecrit_par(engines, article, noms_auteurs, noms_relecteurs, noms_redaction)
-
     remplissage_parlede(engines, noms_politique, article)
-
     remplissage_reference(engines, article)
-
     remplissage_refere(engines, article)
-
     remplissage_contient(engines, article)
-
     remplissage_article_en_lien(engines, article)
-
     remplissage_en_lien(engines, article)
 
     print("Fin")
