@@ -159,9 +159,10 @@ class EcritPar(Base):
     # Relationship avec Auteur
     child_ecritpar = relationship('Auteur', back_populates="parent_ecritpar")
 
-    def __init__(self, url: str, nom: str):
+    def __init__(self, url: str, nom: str, role:str):
         self.URL = url
         self.nom = nom
+        self.Roles = role
 
 
 class Contient(Base):
