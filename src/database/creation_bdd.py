@@ -29,16 +29,21 @@ def connexion(user, pwd, host, port, name):
 
 
 def insert(session, valeur) -> None:
+    """
+    Permet d'insérer les tuples dans la base de donnée et de commit l'insertion.
+    :param session : instance de connexion à la base de donnée.
+    :param valeur : tuple à insérer.
+    """
     session.add(valeur)
     session.commit()
 
 
 def setup_date(string: str):
     """
-    Prend un date et la retructure en format reconnu par PostgreSQL.
+    Prend une date et la reformate dans un format reconnu par PostgreSQL.
 
-    :param string:
-    :return la date restructuré sous format PostgreSQL.
+    :param string : la date à formater.
+    :return : la date reformatée sous format PostgreSQL.
     """
     if string is None:
         return None
@@ -82,9 +87,9 @@ def insert_auteur(session, element, articles) -> None:
     """
     Permet l'insertion des auteurs dans la base de données.
 
-    :param session: élément pour l'interaction avec la base de données.
-    :param element: numéro d'article courant.
-    :param articles: instance de la classe Article.
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param articles : instance de la classe Surlignage.
     """
     for auteur in articles[element]:
         q = session.query(Auteur).filter(Auteur.nom == auteur)
@@ -96,9 +101,9 @@ def insert_personnalite(session, element, personnalite) -> None:
     """
     Permet l'insertion des personnalités (personne sur lequel porte l'article) dans la base de données.
 
-    :param session: élément pour l'interaction avec la base de données
-    :param element: numéro d'article courant.
-    :param personnalite:
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param personnalite : nom de la personnalité.
     """
     for perso in personnalite[element]:
         q = session.query(Personnalite).filter(Personnalite.nom == perso)
@@ -110,9 +115,9 @@ def insert_source(session, element, articles) -> None:
     """
     Permet l'insertion des sources dans la base de données.
 
-    :param session: élément pour l'interaction avec la base de données
-    :param element: numéro d'article courant.
-    :param articles: instance de la classe Article.
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param articles : instance de la classe Surlignage.
     """
     if articles.url_source[element][0] is not None:
         q = session.query(Source).filter(Source.URL == articles.url_source[element][0])
@@ -124,10 +129,9 @@ def insert_contenu(session, element, articles) -> None:
     """
     Permet l'insertion du contenu de l'article dans la base de données.
 
-    :param session: élément pour l'interaction avec la base de données.
-    :param element: numéro d'article courant.
-    :param article: instance de la classe Article représente la table des articles dans la base de données.
-    :param articles: instance de la classe ArticleCourt ou ArticleLong.
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param articles : instance de la classe Surlignage.
     """
 
     for contenu_article in articles.contenu[element]:
@@ -141,9 +145,9 @@ def insert_article(session, element, articles) -> None:
     """
     Permet l'insertion des articles de type court dans la base de données.
 
-    :param session: élément pour l'interaction avec la base de données
-    :param element: numéro d'article courant.
-    :param articles: instance de la classe Article.
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param articles : instance de la classe Surlignage.
     """
 
     date_creation = setup_date(articles.date_creation[element])
@@ -161,12 +165,12 @@ def insert_ecritpar(session, element, auteurs, relecteurs, secretariats, article
     """
     Permet l'insertion des articles de type court dans la base de données.
 
-    :param article:
-    :param secretariats:
-    :param relecteurs:
-    :param auteurs:
-    :param session: élément pour l'interaction avec la base de données
-    :param element: numéro d'article courant.
+    :param article : instance de la classe Surlignage.
+    :param secretariats : tableau contenant les personnes liées au secrétariat.
+    :param relecteurs : tableau contenant les personnes liées aux relecteurs.
+    :param auteurs : tableau contenant les personnes liées aux auteurs.
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
     """
 
     for auteur in auteurs[element]:
@@ -192,10 +196,10 @@ def insert_parlede(session, element, personnalite, article) -> None:
     """
     Permet l'insertion des articles de type court dans la base de données.
 
-    :param personnalite:
-    :param article:
-    :param session: élément pour l'interaction avec la base de données
-    :param element: numéro d'article courant.
+    :param personnalite : nom de la personnalité
+    :param article : instance de la classe Surlignage.
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
     """
 
     for auteur in personnalite[element]:
@@ -206,7 +210,13 @@ def insert_parlede(session, element, personnalite, article) -> None:
 
 
 def insert_reference(session, element, article) -> None:
+    """
+    Permet l'insertion des références dans la base de données.
 
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param article : instance de la classe Surlignage.
+    """
     for ref in enumerate(article.url_references[element]):
         if article.url_references[element][ref[0]] is not None:
             q = session.query(Reference).filter(Reference.URL == article.url_references[element][ref[0]])
@@ -216,6 +226,13 @@ def insert_reference(session, element, article) -> None:
 
 
 def insert_refere(session, element, article) -> None:
+    """
+    Permet l'insertion des références en fonction des articles dans la base de données.
+
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param article : instance de la classe Surlignage.
+    """
     for ref in enumerate(article.url_references[element]):
         if article.url_references[element][ref[0]] is not None:
             q = session.query(Refere).filter(Refere.URL_article == article.url_surlignage[element]) \
@@ -225,6 +242,13 @@ def insert_refere(session, element, article) -> None:
 
 
 def insert_contient(session, element, article) -> None:
+    """
+    Permet l'insertion des contenus en fonction des articles dans la base de données.
+
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param article : instance de la classe Surlignage.
+    """
     for paragraphe in enumerate(article.contenu[element]):
         if article.contenu[element][paragraphe[0]] not in [None, " ", ""]:
             q = session.query(Contient).filter(Contient.URL == article.url_surlignage[element]) \
@@ -234,6 +258,13 @@ def insert_contient(session, element, article) -> None:
 
 
 def insert_article_en_lien(session, element, articles) -> None:
+    """
+    Permet l'insertion des articles en lien dans la base de données.
+
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param articles : instance de la classe Surlignage.
+    """
     for article in enumerate(articles.meme_theme[element]):
         if article[0] is not None:
             q = session.query(ArticleEnLien).filter(ArticleEnLien.URL == articles.meme_theme[element][article[0]])
@@ -242,6 +273,13 @@ def insert_article_en_lien(session, element, articles) -> None:
 
 
 def insert_en_lien(session, element, articles) -> None:
+    """
+    Permet l'insertion des articles en lien en fonction de chaque article dans la base de données.
+
+    :param session : instance de connexion à la base de donnée.
+    :param element : numéro d'article courant.
+    :param articles : instance de la classe Surlignage.
+    """
     for article_lien in enumerate(articles.meme_theme[element]):
         if articles.meme_theme[element][article_lien[0]] is not None:
             q = session.query(EnLien).filter(EnLien.URL_article == articles.url_surlignage[element]) \
@@ -252,10 +290,10 @@ def insert_en_lien(session, element, articles) -> None:
 
 def remplissage_article(engine, article) -> None:
     """
-    Permet de remplir la base de données.
+    Permet de remplir les articles dans la base de données.
 
-    :param article:
-    :param engine : MockConnection de la base de données.
+    :param article : Instance de la classe Surlignage.
+    :param engine : instance de connexion à la base de donnée.
     """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage article')
     with Session(bind=engine) as session:
@@ -267,10 +305,10 @@ def remplissage_article(engine, article) -> None:
 
 def remplissage_auteur(engine, auteurs) -> None:
     """
-    Permet de remplir la base de données.
+    Permet de remplir les auteurs dans la base de données.
 
-    :param auteurs:
-    :param engine : MockConnection de la base de données.
+    :param auteurs : tableau contenant les auteurs.
+    :param engine : instance de connexion à la base de donnée.
     """
     pbar = tqdm(range(len(auteurs)), colour='green', desc='Remplissage auteur')
     with Session(bind=engine) as session:
@@ -282,10 +320,10 @@ def remplissage_auteur(engine, auteurs) -> None:
 
 def remplissage_personnalite(engine, personnalite) -> None:
     """
-    Permet de remplir la base de données.
+    Permet de remplir les personnalités dans la base de données.
 
-    :param personnalite:
-    :param engine : MockConnection de la base de données.
+    :param personnalite : tableau contenant les personnalités.
+    :param engine : instance de connexion à la base de donnée.
     """
     pbar = tqdm(range(len(personnalite)), colour='green', desc='Remplissage personnalité')
     with Session(bind=engine) as session:
@@ -297,10 +335,10 @@ def remplissage_personnalite(engine, personnalite) -> None:
 
 def remplissage_source(engine, article) -> None:
     """
-    Permet de remplir la base de données.
+    Permet de remplir les sources dans la base de données.
 
-    :param source:
-    :param engine : MockConnection de la base de données.
+    :param article : instance de la classe Surlignage.
+    :param engine : instance de connexion à la base de donnée.
     """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage source')
     with Session(bind=engine) as session:
@@ -310,13 +348,12 @@ def remplissage_source(engine, article) -> None:
             pbar.refresh()
 
 
-def remplissage_contenu(engine, article):
+def remplissage_contenu(engine, article) -> None:
     """
-    Permet de remplir la base de données.
+    Permet de remplir le texte des articles la base de données.
 
-    :param article:
-    :param contenu:
-    :param engine : MockConnection de la base de données.
+    :param article : instance de la classe Surlignage.
+    :param engine : instance de connexion à la base de donnée.
     """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage contenu')
     with Session(bind=engine) as session:
@@ -326,7 +363,16 @@ def remplissage_contenu(engine, article):
             pbar.refresh()
 
 
-def remplissage_ecrit_par(engine, article, auteurs, relecteurs, secretariat):
+def remplissage_ecrit_par(engine, article, auteurs, relecteurs, secretariat) -> None:
+    """
+    Permet de mettre en relation les articles ainsi que leurs auteurs dans la base de données.
+
+    :param engine : instance de connexion à la base de données.
+    :param article : instance de la classe Surlignage.
+    :param auteurs : tableau contenant les auteurs.
+    :param relecteurs : tableau contenant les relecteurs.
+    :param secretariat : tableau contenant les membres du secretariat.
+    """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage ecrit_par')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
@@ -335,7 +381,14 @@ def remplissage_ecrit_par(engine, article, auteurs, relecteurs, secretariat):
             pbar.refresh()
 
 
-def remplissage_parlede(engine, personnalite, article):
+def remplissage_parlede(engine, personnalite, article) -> None:
+    """
+    Permet de remplir les personnalités en fonctions des articles la base de données.
+
+    :param engine : instance de connexion à la base de donnée.
+    :param personnalite : tableau contenant les personnalités.
+    :param article : instance de la classe Surlignage.
+    """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage parle_de')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
@@ -344,7 +397,12 @@ def remplissage_parlede(engine, personnalite, article):
             pbar.refresh()
 
 
-def remplissage_reference(engine, article):
+def remplissage_reference(engine, article) -> None:
+    """
+    Permet de remplir les URLs contenant dans le texte des articles dans la base de données.
+    :param engine : instance de connexion à la base de donnée.
+    :param article : instance de la classe Surlignage.
+    """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage Reference')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
@@ -353,7 +411,12 @@ def remplissage_reference(engine, article):
             pbar.refresh()
 
 
-def remplissage_refere(engine, article):
+def remplissage_refere(engine, article) -> None:
+    """
+    Permet de remplir les URLs des références en fonction des articles dans la base de données.
+    :param engine : instance de connexion à la base de donnée.
+    :param article : instance de la classe Surlignage.
+    """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage Refere')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
@@ -362,7 +425,12 @@ def remplissage_refere(engine, article):
             pbar.refresh()
 
 
-def remplissage_contient(engine, article):
+def remplissage_contient(engine, article) -> None:
+    """
+    Permet de remplir le texte des articles en fonctions des articles dans la base de données.
+    :param engine : instance de connexion à la base de donnée.
+    :param article : instance de la classe Surlignage.
+    """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage Contient')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
@@ -371,7 +439,12 @@ def remplissage_contient(engine, article):
             pbar.refresh()
 
 
-def remplissage_article_en_lien(engine, article):
+def remplissage_article_en_lien(engine, article) -> None:
+    """
+    Permet de remplir les URL des articles en liens en fonction des articles insérés dans la base de données.
+    :param engine : instance de connexion à la base de donnée.
+    :param article : instance de la classe Surlignage.
+    """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage ArticleEnLien')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
@@ -380,7 +453,12 @@ def remplissage_article_en_lien(engine, article):
             pbar.refresh()
 
 
-def remplissage_en_lien(engine, article):
+def remplissage_en_lien(engine, article) -> None:
+    """
+    Permet de remplir les articles en lien à chaque article dans la base de données.
+    :param engine : instance de connexion à la base de donnée.
+    :param article : instance de la classe Surlignage.
+    """
     pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage EnLien')
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):

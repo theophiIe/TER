@@ -6,6 +6,9 @@ Base = declarative_base()
 
 
 class Auteur(Base):
+    """
+    Classe permettant de créer la table Auteur dans la base de donnée.
+    """
     __tablename__ = "t_auteur"
 
     nom = Column(String, primary_key=True)
@@ -20,6 +23,9 @@ class Auteur(Base):
 
 
 class Personnalite(Base):
+    """
+    Classe permettant de créer la table Personnalité dans la base de donnée.
+    """
     __tablename__ = "t_personnalite"
 
     nom = Column(String, primary_key=True)
@@ -32,6 +38,9 @@ class Personnalite(Base):
 
 
 class Article(Base):
+    """
+    Classe permettant de créer la table Article dans la base de donnée.
+    """
     __tablename__ = "t_article"
 
     URL = Column(String, primary_key=True)
@@ -74,6 +83,9 @@ class Article(Base):
 
 
 class Source(Base):
+    """
+    Classe permettant de créer la table Source dans la base de donnée.
+    """
     __tablename__ = "t_source"
 
     URL = Column(String, primary_key=True)
@@ -88,6 +100,9 @@ class Source(Base):
 
 
 class Contenu(Base):
+    """
+    Classe permettant de créer la table Contenu dans la base de donnée.
+    """
     __tablename__ = "t_contenu"
 
     texte = Column(String, primary_key=True)
@@ -100,6 +115,9 @@ class Contenu(Base):
 
 
 class Reference(Base):
+    """
+    Classe permettant de créer la table Reference dans la base de donnée.
+    """
     __tablename__ = "t_reference"
 
     URL = Column(String, primary_key=True)
@@ -114,6 +132,9 @@ class Reference(Base):
 
 
 class ParleDe(Base):
+    """
+    Classe permettant de créer la table ParleDe dans la base de donnée.
+    """
     __tablename__ = "t_parlede"
 
     # Foreign Key de Article
@@ -134,6 +155,9 @@ class ParleDe(Base):
 
 
 class EcritPar(Base):
+    """
+    Classe permettant de créer la table Auteur EcritPar la base de donnée.
+    """
     __tablename__ = "t_ecritpar"
 
     # Foreign Key de Article
@@ -157,6 +181,9 @@ class EcritPar(Base):
 
 
 class Contient(Base):
+    """
+    Classe permettant de créer la table Contient dans la base de donnée.
+    """
     __tablename__ = "t_contient"
 
     # Foreign Key de Article
@@ -177,6 +204,9 @@ class Contient(Base):
 
 
 class Refere(Base):
+    """
+    Classe permettant de créer la table Refere la base de donnée.
+    """
     __tablename__ = "t_refere"
 
     # Foreign Key de Article
@@ -197,6 +227,9 @@ class Refere(Base):
 
 
 class ArticleEnLien(Base):
+    """
+    Classe permettant de créer la table ArticleEnLien la base de donnée.
+    """
     __tablename__ = "t_articleenlien"
 
     URL = Column(String, primary_key=True)
@@ -209,6 +242,9 @@ class ArticleEnLien(Base):
 
 
 class EnLien(Base):
+    """
+    Classe permettant de créer la table EnLien la base de donnée.
+    """
     __tablename__ = "t_enlien"
 
     # Foreign Key de Article

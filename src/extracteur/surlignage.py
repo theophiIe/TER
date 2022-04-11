@@ -3,10 +3,18 @@ import unicodedata
 
 
 def normalize_text(texte: str) -> str:
+    """
+    Permet le formatage d'une string.
+    :param texte : texte à formatter.
+    :return : texte formaté.
+    """
     return unicodedata.normalize("NFKD", texte)
 
 
 class Surlignage:
+    """
+    Classe contenant toutes les informations des articles de type Surlignage.
+    """
     def __init__(self):
         self.url = 'https://lessurligneurs.eu/surlignage/'
         self.url_surlignage = []
@@ -28,6 +36,11 @@ class Surlignage:
         self.meme_theme = []
 
     def get_url(self, page, dico_balise) -> None:
+        """
+        Permet de remplir la table `url_surlignage` avec les URL des articles de type surlignage.
+        :param page : une page parsée par bs4.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         articles = page.find_all(class_=dico_balise['class']['container_article'])
 
         for article in articles:
@@ -35,6 +48,11 @@ class Surlignage:
                 self.url_surlignage.append(lien.get(dico_balise['balise']['url']))
 
     def get_titre_surlignage(self, dom, dico_balise) -> None:
+        """
+        Permet de remplir la table `titre` avec les titres de chaque article.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         titre = dom.xpath(dico_balise['xpath']['titre'])
         contenu_titre = []
 
@@ -45,9 +63,20 @@ class Surlignage:
         self.titre.append(contenu_titre)
 
     def get_etiquette_surlignage(self, dom, dico_balise) -> None:
+        """
+        Permet de remplir le tableau 'etiquette' avec les étiquettes de chaque article.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         self.etiquette.append(normalize_text(dom.xpath(dico_balise['xpath']['etiquette'])[0]))
 
     def get_meme_theme_surlignage(self, dom, dico_balise) -> None:
+        """
+        Permet de remplir le tableau 'meme_theme' avec les URL des articles
+        dont le thème est identique à l'article courant.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         url_meme_theme = []
 
         res1 = dom.xpath(dico_balise['xpath']['meme_theme_1'])
@@ -66,6 +95,11 @@ class Surlignage:
         self.meme_theme.append(url_meme_theme)
 
     def get_date_surlignage(self, dom, dico_balise) -> None:
+        """
+        Permet de remplir les tableaux 'date_creation' ainsi que 'date_modification' pour chaque article.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         date_creation = dom.xpath(dico_balise['xpath']['date_creation'])
         date_modification = dom.xpath(dico_balise['xpath']['date_modification'])
 
@@ -84,6 +118,12 @@ class Surlignage:
 
     # Pour la V2
     def __get_contributeur(self, page, dico_balise) -> bool:
+        """
+        Permet de remplir les tableaux des 'auteur', 'relecteur' et 'redaction' pour chaque article.
+        :param page : une page parsée par bs4.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        :return : True si les auteurs sont trouvés False sinon.
+        """
         articles_contributeurs = page.find(class_=dico_balise['class']['contributeur'])
 
         if articles_contributeurs is not None:
@@ -134,6 +174,11 @@ class Surlignage:
 
     # Pour la V1
     def __get_auteurs(self, dom, dico_balise) -> None:
+        """
+        Permet de remplir le tableau 'auteur' avec l'auteur de chaque article.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         auteur = dom.xpath(dico_balise['xpath']['auteur'])
         resultat = []
 
@@ -143,10 +188,21 @@ class Surlignage:
         self.auteurs.append(resultat)
 
     def get_auteurs_surlignage(self, page, dom, dico_balise) -> None:
+        """
+        Permet de remplir les tableaux des contributeurs d'un article.
+        :param page : une page parsée par bs4.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         if not self.__get_contributeur(page, dico_balise):
             self.__get_auteurs(dom, dico_balise)
 
     def get_source_surlignage(self, dom, dico_balise) -> None:
+        """
+        Permet de remplir les tableaux 'url_source' ainsi que 'nom_source' avec les sources issues de chaque article.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         url_source = dom.xpath(dico_balise['xpath']['url_source'])
         nom_source = dom.xpath(dico_balise['xpath']['nom_source'])
 
@@ -167,6 +223,11 @@ class Surlignage:
         self.nom_source.append(nom)
 
     def get_correction_surlignage(self, dom, dico_balise) -> None:
+        """
+        Permet de remplir le tableau 'correction' avec l'introduction de chaque article.
+        :param dom : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         correction = dom.xpath(dico_balise['xpath']['correction'])
         resultat = None
 
@@ -175,6 +236,11 @@ class Surlignage:
         self.correction.append(resultat)
 
     def get_contenu_surlignage(self, page, dico_balise) -> None:
+        """
+        Permet de remplir le tableau 'contenu' avec le contenue de chaque article.
+        :param page : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         contenu_article = []
         texte = page.find(class_=dico_balise['class']['contenue'])
 
@@ -186,6 +252,12 @@ class Surlignage:
         self.contenu.append(contenu_article)
 
     def get_reference_surlignage(self, page, dico_balise) -> None:
+        """
+        Permet de remplir les tableaux 'url_references' ainsi que 'nom_references' avec les différents
+        liens et le nom de chaque citation et references dans chaque article.
+        :param page : parsing d'une page HTML.
+        :param dico_balise : fichier JSON contenant les balises et les Xpath.
+        """
         texte = page.find(class_=dico_balise['class']['contenue'])
         liens_references = []
         nom_references = []

@@ -12,6 +12,7 @@ from src.extracteur.traitement import recuperation_nom
 
 
 def main(user, pwd, host, port, db):
+    # Chargement du fichier JSON
     with open("balise.json") as json_file:
         balise = json.load(json_file)
 
@@ -22,6 +23,7 @@ def main(user, pwd, host, port, db):
 
     remplir_surlignage(article, balise)
 
+    # Utilisation de Flair pour la reconnaissance des noms
     print("Chargement de Flair french:")
     tagger = SequenceTagger.load("flair/ner-french")
     noms_auteurs = recuperation_nom(article.auteurs, tagger)
@@ -29,8 +31,10 @@ def main(user, pwd, host, port, db):
     noms_redaction = recuperation_nom(article.redaction, tagger)
     noms_politique = recuperation_nom(article.titre, tagger)
 
+    # Connexion à la base de donnée
     engines = connexion(user, pwd, host, port, db)
 
+    # Insertion des tuples dans la base de donnée
     remplissage_source(engines, article)
     remplissage_article(engines, article)
     remplissage_auteur(engines, noms_auteurs)
