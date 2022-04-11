@@ -8,7 +8,7 @@ from tqdm import tqdm
 from src.extracteur_v2.extraction import get_url_all_surlignage
 from src.extracteur_v2.surlignage import Surlignage
 from src.database_V2.table_bdd import Base, Auteur, Personnalite, Article, Source, \
-    Contenu, Reference, ParleDe, EcritPar, Contient, Refere
+    Contenu, Reference, ParleDe, EcritPar, Contient, Refere, ArticleEnLien, EnLien
 from src.extracteur_v2.traitement import recuperation_nom
 from flair.models import SequenceTagger
 
@@ -236,6 +236,23 @@ def insert_contient(session, element, article) -> None:
                 insert(session, Contient(article.url_surlignage[element], article.contenu[element][paragraphe]))
 
 
+def insert_article_en_lien(session, element, articles) -> None:
+    for article in range(len(articles.meme_theme[element])):
+        if article is not None:
+            q = session.query(ArticleEnLien).filter(ArticleEnLien.URL == articles.meme_theme[element][article])
+            if not session.query(q.exists()).scalar():
+                insert(session, ArticleEnLien(articles.meme_theme[element][article]))
+
+
+def insert_en_lien(session, element, articles) -> None:
+    for article_lien in range(len(articles.meme_theme[element])):
+        if articles.meme_theme[element][article_lien] is not None:
+            q = session.query(EnLien).filter(EnLien.URL_article == articles.url_surlignage[element]) \
+                .filter(EnLien.URL_article_en_lien == articles.meme_theme[element][article_lien])
+            if not session.query(q.exists()).scalar():
+                insert(session, EnLien(articles.url_surlignage[element], articles.meme_theme[element][article_lien]))
+
+
 def remplissage_article(engine, article) -> None:
     """
     Permet de remplir la base de données.
@@ -353,5 +370,23 @@ def remplissage_contient(engine, article):
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
             insert_contient(session, element, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_article_en_lien(engine, article):
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage ArticleEnLien')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_article_en_lien(session, element, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_en_lien(engine, article):
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage EnLien')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_en_lien(session, element, article)
             pbar.update(1)
             pbar.refresh()
