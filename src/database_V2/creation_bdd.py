@@ -210,11 +210,30 @@ def insert_parlede(session, element, personnalite, article) -> None:
 
 
 def insert_reference(session, element, article) -> None:
+
     for ref in range(len(article.url_references[element])):
         if article.url_references[element][ref] is not None:
             q = session.query(Reference).filter(Reference.URL == article.url_references[element][ref])
             if not session.query(q.exists()).scalar():
                 insert(session, Reference(article.url_references[element][ref], article.nom_references[element][ref]))
+
+
+def insert_refere(session, element, article) -> None:
+    for ref in range(len(article.url_references[element])):
+        if article.url_references[element][ref] is not None:
+            q = session.query(Refere).filter(Refere.URL_article == article.url_surlignage[element]) \
+                .filter(Refere.URL_reference == article.url_references[element][ref])
+            if not session.query(q.exists()).scalar():
+                insert(session, Refere(article.url_surlignage[element], article.url_references[element][ref]))
+
+
+def insert_contient(session, element, article) -> None:
+    for paragraphe in range(len(article.contenu[element])):
+        if article.contenu[element][paragraphe] not in [None, " ", ""]:
+            q = session.query(Contient).filter(Contient.URL == article.url_surlignage[element]) \
+                .filter(Contient.ID == article.contenu[element][paragraphe])
+            if not session.query(q.exists()).scalar():
+                insert(session, Contient(article.url_surlignage[element], article.contenu[element][paragraphe]))
 
 
 def remplissage_article(engine, article) -> None:
@@ -316,5 +335,23 @@ def remplissage_reference(engine, article):
     with Session(bind=engine) as session:
         for element in range(len(article.url_surlignage)):
             insert_reference(session, element, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_refere(engine, article):
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage Refere')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_refere(session, element, article)
+            pbar.update(1)
+            pbar.refresh()
+
+
+def remplissage_contient(engine, article):
+    pbar = tqdm(range(len(article.url_surlignage)), colour='green', desc='Remplissage Contient')
+    with Session(bind=engine) as session:
+        for element in range(len(article.url_surlignage)):
+            insert_contient(session, element, article)
             pbar.update(1)
             pbar.refresh()
