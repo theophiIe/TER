@@ -119,6 +119,22 @@ Exemple de relation :
 ## src/extracteur
 Dossier contenant les fichiers permettant l'extraction et le traitement des données. 
 
+#### Exemple d'un article :
+
+![exemple d'image d'un article.](/images/ImageArticle.png "exemple d'image d'un article.")
+
+**Légendes :** 
+
+* Violet [Date Création/Date Modification]
+* Orange [Auteurs]
+* Rouge [Etiquette]
+* Vert [Titre]
+* Bleu [Source]
+* Jaune [Correction]
+* Turquoise [Contenue de l'article]
+* Fuchsia [Les réferences]
+* Noir [Même thème]
+
 ### [extraction.py](https://github.com/theophiIe/TER/blob/xpath_version/extraction.py)
 
 Ce fichier contient les fonctions permettant de récupérer le nombres de pages présent dans une URL, le nombre
