@@ -17,7 +17,6 @@ Les tâches à réaliser sont donc :
 * Choix argumenté du modèle de données cible
 * Implémentation des scripts d'intégration des sources
 * Expérimentation d'algorithmes de fouille de textes
-
 -------
 
 ## Pré-requis 📂
@@ -37,6 +36,11 @@ pip3 install -r requirements.txt
 ```sh
 python3 main.py --user [name] --pwd [password] --host [host] --port [num_port] --db [nom_bd]
 ```
+
+-------
+## Documentation 📄
+
+[Lien documentation](https://github.com/theophiIe/TER/blob/xpath_version/DOCUMENTATION.md)
 
 -------
 
