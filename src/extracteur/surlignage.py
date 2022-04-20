@@ -68,7 +68,11 @@ class Surlignage:
         :param dom : parsing d'une page HTML.
         :param dico_balise : fichier JSON contenant les balises et les Xpath.
         """
-        self.etiquette.append(normalize_text(dom.xpath(dico_balise['xpath']['etiquette'])[0]))
+        xpath = dom.xpath(dico_balise['xpath']['etiquette'])
+        if xpath:
+            self.etiquette.append(normalize_text(xpath[0]))
+        else:
+            self.etiquette.append(None)
 
     def get_meme_theme_surlignage(self, dom, dico_balise) -> None:
         """
