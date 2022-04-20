@@ -94,7 +94,7 @@ def insert_auteur(session, element, articles) -> None:
     for auteur in articles[element]:
         q = session.query(Auteur).filter(Auteur.nom == auteur)
         if not session.query(q.exists()).scalar():
-            insert(session, Auteur(auteur, None))
+            insert(session, Auteur(auteur))
 
 
 def insert_personnalite(session, element, personnalite) -> None:
@@ -120,7 +120,7 @@ def insert_source(session, element, articles) -> None:
     :param articles : instance de la classe Surlignage.
     """
     if articles.url_source[element][0] is not None:
-        q = session.query(Source).filter(Source.URL == articles.url_source[element][0])
+        q = session.query(Source).filter(Source.url == articles.url_source[element][0])
         if not session.query(q.exists()).scalar():
             insert(session, Source(articles.url_source[element][0], articles.nom_source[element][0]))
 
@@ -156,7 +156,7 @@ def insert_article(session, element, articles) -> None:
     article = Article(articles.url_surlignage[element], articles.titre[element][0], date_creation, date_modificication,
                       articles.correction[element], articles.etiquette[element], articles.url_source[element][0])
 
-    q = session.query(Article).filter(Article.URL == article.URL)
+    q = session.query(Article).filter(Article.url == article.url)
     if not session.query(q.exists()).scalar():
         insert(session, article)
 
@@ -174,19 +174,19 @@ def insert_ecritpar(session, element, auteurs, relecteurs, secretariats, article
     """
 
     for auteur in auteurs[element]:
-        q = session.query(EcritPar).filter(EcritPar.nom == auteur).filter(EcritPar.URL == article.url_surlignage[element])
+        q = session.query(EcritPar).filter(EcritPar.nom == auteur).filter(EcritPar.url == article.url_surlignage[element])
         if not session.query(q.exists()).scalar():
             ecrit_par = EcritPar(article.url_surlignage[element], auteur, "Auteur")
             insert(session, ecrit_par)
 
     for relecteur in relecteurs[element]:
-        q = session.query(EcritPar).filter(EcritPar.nom == relecteur).filter(EcritPar.URL == article.url_surlignage[element])
+        q = session.query(EcritPar).filter(EcritPar.nom == relecteur).filter(EcritPar.url == article.url_surlignage[element])
         if not session.query(q.exists()).scalar():
             ecrit_par = EcritPar(article.url_surlignage[element], relecteur, "Relecteur")
             insert(session, ecrit_par)
 
     for secretariat in secretariats[element]:
-        q = session.query(EcritPar).filter(EcritPar.nom == secretariat).filter(EcritPar.URL == article.url_surlignage[element])
+        q = session.query(EcritPar).filter(EcritPar.nom == secretariat).filter(EcritPar.url == article.url_surlignage[element])
         if not session.query(q.exists()).scalar():
             ecrit_par = EcritPar(article.url_surlignage[element], secretariat, "Secretariat")
             insert(session, ecrit_par)
@@ -203,7 +203,7 @@ def insert_parlede(session, element, personnalite, article) -> None:
     """
 
     for auteur in personnalite[element]:
-        q = session.query(ParleDe).filter(ParleDe.nom == auteur).filter(ParleDe.URL == article.url_surlignage[element])
+        q = session.query(ParleDe).filter(ParleDe.nom == auteur).filter(ParleDe.url == article.url_surlignage[element])
         if not session.query(q.exists()).scalar():
             parle_de = ParleDe(article.url_surlignage[element], auteur)
             insert(session, parle_de)
@@ -219,7 +219,7 @@ def insert_reference(session, element, article) -> None:
     """
     for ref in enumerate(article.url_references[element]):
         if article.url_references[element][ref[0]] is not None:
-            q = session.query(Reference).filter(Reference.URL == article.url_references[element][ref[0]])
+            q = session.query(Reference).filter(Reference.url == article.url_references[element][ref[0]])
             if not session.query(q.exists()).scalar():
                 insert(session, Reference(article.url_references[element][ref[0]],
                                           article.nom_references[element][ref[0]]))
@@ -235,8 +235,8 @@ def insert_refere(session, element, article) -> None:
     """
     for ref in enumerate(article.url_references[element]):
         if article.url_references[element][ref[0]] is not None:
-            q = session.query(Refere).filter(Refere.URL_article == article.url_surlignage[element]) \
-                .filter(Refere.URL_reference == article.url_references[element][ref[0]])
+            q = session.query(Refere).filter(Refere.url_article == article.url_surlignage[element]) \
+                .filter(Refere.url_reference == article.url_references[element][ref[0]])
             if not session.query(q.exists()).scalar():
                 insert(session, Refere(article.url_surlignage[element], article.url_references[element][ref[0]]))
 
@@ -251,8 +251,8 @@ def insert_contient(session, element, article) -> None:
     """
     for paragraphe in enumerate(article.contenu[element]):
         if article.contenu[element][paragraphe[0]] not in [None, " ", ""]:
-            q = session.query(Contient).filter(Contient.URL == article.url_surlignage[element]) \
-                .filter(Contient.ID == article.contenu[element][paragraphe[0]])
+            q = session.query(Contient).filter(Contient.url == article.url_surlignage[element]) \
+                .filter(Contient.id == article.contenu[element][paragraphe[0]])
             if not session.query(q.exists()).scalar():
                 insert(session, Contient(article.url_surlignage[element], article.contenu[element][paragraphe[0]]))
 
@@ -267,7 +267,7 @@ def insert_article_en_lien(session, element, articles) -> None:
     """
     for article in enumerate(articles.meme_theme[element]):
         if article[0] is not None:
-            q = session.query(ArticleEnLien).filter(ArticleEnLien.URL == articles.meme_theme[element][article[0]])
+            q = session.query(ArticleEnLien).filter(ArticleEnLien.url == articles.meme_theme[element][article[0]])
             if not session.query(q.exists()).scalar():
                 insert(session, ArticleEnLien(articles.meme_theme[element][article[0]]))
 
@@ -282,8 +282,8 @@ def insert_en_lien(session, element, articles) -> None:
     """
     for article_lien in enumerate(articles.meme_theme[element]):
         if articles.meme_theme[element][article_lien[0]] is not None:
-            q = session.query(EnLien).filter(EnLien.URL_article == articles.url_surlignage[element]) \
-                .filter(EnLien.URL_article_en_lien == articles.meme_theme[element][article_lien[0]])
+            q = session.query(EnLien).filter(EnLien.url_article == articles.url_surlignage[element]) \
+                .filter(EnLien.url_article_en_lien == articles.meme_theme[element][article_lien[0]])
             if not session.query(q.exists()).scalar():
                 insert(session, EnLien(articles.url_surlignage[element], articles.meme_theme[element][article_lien[0]]))
 
