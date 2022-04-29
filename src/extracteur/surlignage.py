@@ -186,7 +186,7 @@ class Surlignage:
         auteur = dom.xpath(dico_balise['xpath']['auteur'])
         resultat = []
 
-        if auteur[0] != "":
+        if auteur and auteur[0] != "":
             resultat.append(normalize_text(auteur[0]))
 
         self.auteurs.append(resultat)
