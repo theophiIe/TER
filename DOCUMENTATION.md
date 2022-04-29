@@ -10,6 +10,7 @@ TER/
 ├── main.py
 ├── README.md
 ├── requirements.txt
+├── resultat_flair.txt
 └── src
     ├── database
     │   ├── creation_bdd.py
@@ -174,3 +175,23 @@ dont l'objectif est de récupérer les différents noms présents dans un texte.
 
 Flair va attribuer des balises aux éléments qui compose le texte. Ainsi dans notre cas le tag `PER` 
 sera la cible pour identifier le nom d'une personnalité, d'un auteur ou encore d'un relecteur.
+
+### [resultat_flair.txt](https://github.com/theophiIe/TER/blob/xpath_version/resultat_flair.txt)
+
+Le fichier `resultat_flair.txt` contient toutes les strings utilisant `Flair` pour la détection des noms au jour du __29/04/2022 à 22:00__. 
+
+Nous avons utilisé deux méthodes distinctes de calcul pour mesurer la précision d'erreur de `Flair`:
+- La première était de considérer comme faux un résultat dès qu'au moins un des résultats renvoyé d'une phrase analysée était faux.
+- La seconde avait pour but d'affiner nos résultats. Elle consiste en un système de "score". Pour chaque phrase analysée, on compte le nombre de résultats renvoyés faux et le nombre de résultats renvoyés correct.
+
+Nous avons donc:
+- Auteurs : 49/413 string fausse soit __11.86%__ d'erreur pour la première méthode et 52/674 noms faux soit __7.72%__ d'erreur pour la seconde. Les principales erreurs viennent de la reconnaissance du nom `Jules Vernes` qui correspond au nom d'une université,
+ainsi que le mot `Deroulez` qui est souvent reconnue.
+- Relecteurs : 1/28 string fausse soit __3.57%__ d'erreur pour la première méthode et 1/42 noms faux soit __2.68%__ d'erreur pour la seconde. L'erreur vient du fait qu'il reconnait `Jules Vernes` en tant que nom.
+- Secretariat de rédaction : 0/35 string fausse soit __0%__ d'erreur et 0/59 nom faux soit __0%__ d'erreur pour la seconde.
+- Personnalités : 15/415 string fausse soit __3.61%__ d'erreur pour la première méthode et 14/399 nom faux soit __3.51%__ d'erreur pour la seconde. Les erreurs provenant de cette partie sont issus de la ponctuation. 
+Par exemple, une apostrophe empêche la reconnaissance d'un nom dans le cas d'`Emmanuel Macron` ou celui d'`Eric Zemmour`.
+
+Au total, un taux d'erreur de __7.30%__ pour la première méthode et __5.7%__ pour la seconde.
+Ces pourcentages sont à même de varier du fait d'ajout constant d'articles sur le site.
+
