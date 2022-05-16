@@ -9,6 +9,7 @@ TER/
 ├── LICENSE
 ├── main.py
 ├── README.md
+├── REFERENCES.md
 ├── requirements.txt
 ├── resultat_flair.txt
 └── src
