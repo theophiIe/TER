@@ -18,5 +18,5 @@
 
 ## Base de donnée
 [SQLAlchemy] : https://docs.sqlalchemy.org/en/14/dialects/postgresql.html  
-[SQLAlchemy] : https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#association-object
-[SQLAlchemy] : https://koor.fr/Python/CodeSamplesSqlAlchemy/SimpleMapping.wp
+[SQLAlchemy] : https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#association-object  
+[SQLAlchemy] : https://koor.fr/Python/CodeSamplesSqlAlchemy/SimpleMapping.wp  
