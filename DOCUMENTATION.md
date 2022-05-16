@@ -166,13 +166,13 @@ La méthode d'extraction via Xpath n'est pas toujours utilisé, car dans certain
 diffèrent trop d'un article à l'autre.
 
 Exemple pour la partie contributeur :  
-Particularité : possède des balises `span` dans les balises `p`.
+Particularité : possède des balises `span` dans les balises `p`.  
 ![exemple d'image d'un article.](images/contributeur1.png "[Code] : scrapping contributeur.")  
 
-Particularité : possède des uniquement des balises `p`.
+Particularité : possède des uniquement des balises `p`.  
 ![exemple d'image d'un article.](images/contributeur3.png "[Code] : scrapping contributeur.")
 
-Particularité : la `div articles_contributeurs` est vide.
+Particularité : la `div articles_contributeurs` est vide.  
 ![exemple d'image d'un article.](images/contributeur2.png "[Code] : scrapping contributeur.")  
 
 ### [traitement.py](https://github.com/theophiIe/TER/blob/xpath_version/traitement.py)
