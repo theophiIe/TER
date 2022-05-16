@@ -41,6 +41,7 @@ python3 main.py --user [name] --pwd [password] --host [host] --port [num_port] -
 ## Documentation 📄
 
 [Lien documentation](https://github.com/theophiIe/TER/blob/xpath_version/DOCUMENTATION.md)
+[Lien références](https://github.com/theophiIe/TER/blob/xpath_version/REFERENCES.md)
 
 -------
 
